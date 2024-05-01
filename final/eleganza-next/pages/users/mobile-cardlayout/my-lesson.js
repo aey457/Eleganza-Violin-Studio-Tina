@@ -1,3 +1,30 @@
+import React from 'react';
+import Head from 'next/head'
+import styles from './mobile-cardlayout.module.css';
+import LessonCard from '@/component/users/cards/lessoncard';
+import UserLayout from '@/component/users/user-layout';
+
+export default function MyLesson() {
+   return (
+      <>
+         
+      </>
+   
+   );
+}
+
+MyLesson.getLayout = function (page) {
+   return <UserLayout>{page}</UserLayout>;
+};
+
+
+
+
+
+
+
+
+
 <!doctype html>
 <html lang="en">
 

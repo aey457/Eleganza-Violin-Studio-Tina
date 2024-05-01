@@ -1,12 +1,12 @@
-.main{
-   display: flex;
-   flex-direction: row;
-   align-items: flex-start;
-   /* 或許也可用Bootstrap的Grid */
-@media (max-width:1024px) {
-      padding-inline: 20px;
-   }
-}
+// .main{
+//    display: flex;
+//    flex-direction: row;
+//    align-items: flex-start;
+//    /* 或許也可用Bootstrap的Grid */
+// @media (max-width:1024px) {
+//       padding-inline: 20px;
+//    }
+// }
 
 .list-unstyled{
    list-style: none;
@@ -82,7 +82,7 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 0;
-    margin-right: 40px;
+   //  margin-right: 40px;
 
     & ul{
        display: flex;

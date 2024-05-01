@@ -4,7 +4,6 @@ import styles from './sidenav.module.scss'
 export default function SideNav() {
   return (
     <>
-    <div  className={styles['main']}></div>
       <div className={styles['sidenav-desktop']}>
         <ul className={`list-unstyled ${styles['accountname']}`} >
           <li className="">

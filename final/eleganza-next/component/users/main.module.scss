@@ -1,0 +1,13 @@
+
+
+.main{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding-inline: 300px;
+    gap: 40px;
+    /* 或許也可用Bootstrap的Grid */
+ @media (max-width:1024px) {
+       padding-inline: 20px;
+    }
+ }

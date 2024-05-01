@@ -1,11 +1,8 @@
 import React from 'react';
 import Head from 'next/head'
-import Breadcrumb from '@/component/users/breadcrumb'
-import SideNav from '@/component/users/sidenav';
 import styles from './account-center.module.css';
+import UserLayout from '@/component/users/user-layout';
 
-
-//元件的命名一定要英文開頭大寫，否則react會認為是一般的函式
 export default function AccountCenter() {
    return (
 
@@ -14,9 +11,6 @@ export default function AccountCenter() {
         <title>Eleganza Studio</title>
         <meta name="viewport" content="width=device-width" />
       </Head>
-      <Breadcrumb/>
-      <div style={{ display: 'flex' }}>
-         <SideNav />
         <main>
          <div className={styles['mainarea']}>
          <div>
@@ -70,10 +64,12 @@ export default function AccountCenter() {
          </div>
       
       </main>
-      </div>
-
       
     </>
    
    );
 }
+
+AccountCenter.getLayout = function (page) {
+   return <UserLayout>{page}</UserLayout>;
+};

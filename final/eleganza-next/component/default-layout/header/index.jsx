@@ -44,7 +44,7 @@ export default function Header() {
               />
             </a>
             <a href="">
-              <img className={styles.menu} src="./icons/icon-menu-white.svg" />
+              <img className={styles.menu} src="/icons/icon-menu-white.svg" />
             </a>
           </div>
         </div>

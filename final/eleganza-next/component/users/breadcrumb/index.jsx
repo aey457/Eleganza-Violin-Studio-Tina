@@ -21,7 +21,7 @@ export default function Breadcrumb() {
     <ul className={`list-unstyled`}>
       <li>
         <a href="#">
-          <img src="./icons/icon-chevron-left.svg" alt="" />
+          <img src="/icons/icon-chevron-left.svg" alt="" />
         </a>
         會員中心
       </li>

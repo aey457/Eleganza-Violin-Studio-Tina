@@ -12,7 +12,7 @@ export default function AccountCenter() {
         <meta name="viewport" content="width=device-width" />
       </Head>
         <div>
-         <div className={styles['mainarea']}>
+         <div className={styles['mainarea-desktop']}>
          <div>
             <div>
                <p className={styles['maintitle']} >帳號細節</p>

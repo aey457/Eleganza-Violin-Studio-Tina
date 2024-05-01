@@ -1,0 +1,12 @@
+.mainarea-desktop-mylesson{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap; /* 自动换行 */
+    align-items: flex-start;
+    width: 100%; /* 占满父容器的宽度 */
+    flex: 1 0 0;
+    gap: 20px;
+    @media (max-width:1024px) {
+       display: none;
+    }
+ }

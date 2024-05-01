@@ -1,7 +1,7 @@
 import React from 'react'
-import styles from './tab.module.scss'
+import styles from './breadcrumb.module.scss'
 
-export default function Tab() {
+export default function Breadcrumb() {
   return (
     <>
   <div className={styles['tabs-desktop']} >

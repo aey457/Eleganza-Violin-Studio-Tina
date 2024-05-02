@@ -7,15 +7,16 @@ import SideNav from './sidenav';
 import Breadcrumb from './breadcrumb';
 
 export default function UserLayout({ children }) {
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const [windowWidth, setWindowWidth] = useState(0);
 
     useEffect(() => {
         const handleResize = () => setWindowWidth(window.innerWidth);
+        setWindowWidth(window.innerWidth); // 初始設置 windowWidth
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
-    }, []);
+    }, []); // 空的依賴數組以僅在組件掛載時設置一次
 
-    const shouldRenderSideNav = windowWidth > 768; // Adjust this threshold as needed
+    const shouldRenderSideNav = windowWidth > 1024; // 調整閾值
 
     return (
         <>

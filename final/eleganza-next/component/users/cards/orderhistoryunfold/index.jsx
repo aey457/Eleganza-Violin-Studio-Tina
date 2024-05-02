@@ -8,7 +8,7 @@ export default function OrderHistoryUnfold() {
             <div className={styles.orderhistorydetail} >
                 <div className={styles.orderimg} >
                 <a href="">
-                    <img src="./images/product_images/111069.jpg" alt="" />
+                    <img src="/images/product_images/111069.jpg" alt="" />
                 </a>
                 </div>
                 <div className={styles.orderwords} >
@@ -21,7 +21,7 @@ export default function OrderHistoryUnfold() {
                 <div className={styles.orderprice} >
                     <p>$8,5000</p>
                     <div className={styles.orderquantity} >
-                    <img src="./icons/icon-x.svg" alt="" />
+                    <img src="/icons/icon-x.svg" alt="" />
                     <p>1</p>
                     </div>
                 </div>
@@ -40,7 +40,7 @@ export default function OrderHistoryUnfold() {
                 <div className={styles.creditcardno} >
                     <p>Visa **42</p>
                     <img
-                    src="./icons/visa-credit-card-logo-payment-mastercard-usa-visa-e2526db464dd09168c03c4916787dd35.png"
+                    src="/icons/visa-credit-card-logo-payment-mastercard-usa-visa-e2526db464dd09168c03c4916787dd35.png"
                     alt=""
                     />
                 </div>

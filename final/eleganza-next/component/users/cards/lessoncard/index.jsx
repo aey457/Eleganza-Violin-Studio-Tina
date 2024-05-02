@@ -6,7 +6,7 @@ export default function LessonCard() {
     <>
     <div className={styles['lessoncard']}>
         <img
-            src="./images/teacher_images/WuJunyan.jpg"
+            src="/images/teacher_images/WuJunyan.jpg"
             alt=""
             className={styles['lessoncardimg']}
         />

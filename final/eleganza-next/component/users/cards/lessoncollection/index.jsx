@@ -7,7 +7,7 @@ export default function LessonCollection() {
         <div className={styles['productcard']} >
             <a href="">
                 <img
-                src="./images/teacher_images/WuJunyan.jpg"
+                src="/images/teacher_images/WuJunyan.jpg"
                 alt=""
                 className={styles['productcardimg']} 
                 />
@@ -44,7 +44,7 @@ export default function LessonCollection() {
             </div>
         <div className={styles['productcard']}>
                 <img
-                    src="./images/teacher_images/WuJunyan.jpg"
+                    src="/images/teacher_images/WuJunyan.jpg"
                     alt=""
                     className={styles['productcardimg']}
                 />
@@ -66,10 +66,10 @@ export default function LessonCollection() {
                     <li className={styles['productprice']}>$1800</li>
                     <div className={styles['productcardicons']}>
                         <a href="">
-                        <img src="./icons/icon-cart.svg" alt="購物車" />
+                        <img src="/icons/icon-cart.svg" alt="購物車" />
                         </a>
                         <a href="">
-                        <img src="./icons/icon-x.svg" alt="刪除" />
+                        <img src="/icons/icon-x.svg" alt="刪除" />
                         </a>
                     </div>
                     </ul>

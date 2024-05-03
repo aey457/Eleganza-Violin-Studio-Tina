@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from './orderhistoryunfold.module.scss'
 
-export default function OrderHistoryUnfold() {
+export default function OrderHistoryUnfoldCard() {
   return (
     <>
         <div className={`${styles['orderhistorydetailrow']}`} >

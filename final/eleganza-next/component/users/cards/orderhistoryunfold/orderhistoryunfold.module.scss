@@ -1,3 +1,4 @@
+
 .orderhistoryrow-l{
     display: flex;
     flex-direction: row;
@@ -13,6 +14,32 @@
        color: var(--color-secondary-dark);
        margin: 0;
     }
+    @media (max-width:1024px) {
+      display: flex;
+      flex-direction: row;
+      max-height: 72px;
+      padding: 0 20px;
+      justify-content: space-between;
+      align-items: center;
+      align-self: stretch;
+      flex: 1 0 0;
+      flex-wrap: wrap; 
+      gap: auto;
+      border-bottom: 0.5px solid var(--color-primary-medium);
+   }
+    // 限定桌面版
+  &.desktop-only {
+   @media (max-width: 1024px) {
+     display: none;
+   }
+ }
+
+ // 限定手機版
+ &.mobile-only {
+   @media (min-width: 1025px) {
+     display: none;
+   }
+ }
  }
  .checkdetail{
     display: flex;

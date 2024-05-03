@@ -4,7 +4,28 @@ import styles from './orderhistoryunfold.module.scss'
 export default function OrderHistoryUnfoldCard() {
   return (
     <>
-        <div className={`${styles['orderhistorydetailrow']}`} >
+        <div className={`${styles['orderhistoryrow-l']} ${styles['desktop-only']}`} >
+            <p>#512384323</p>
+            <p>November 17, 2023</p>
+            <p>$8,8666</p>
+            <p>已到貨</p>
+            <div className={`${styles['checkdetail']}`} >
+                <p style={{ margin: 0 }}>查看詳情</p>
+                <a href="">
+                <img src="/icons/icon-chevron-down.svg" alt="" />
+                </a>
+            </div>
+        </div>
+        <div className={`${styles['orderhistoryrow-l']} ${styles['mobile-only']}`}>
+            <p>#512384323</p>
+            <p>11/17/2023</p>
+            <p>已到貨</p>
+            <a href="">
+                <img src="/icons/icon-chevron-down.svg" alt="" />
+            </a>
+            </div>
+
+        {/* <div className={`${styles['orderhistorydetailrow']}`} >
             <div className={styles.orderhistorydetail} >
                 <div className={styles.orderimg} >
                 <a href="">
@@ -52,7 +73,7 @@ export default function OrderHistoryUnfoldCard() {
                 </div>
                 </div>
             </div>
-            </div>
+            </div> */}
     </>
   )
 }

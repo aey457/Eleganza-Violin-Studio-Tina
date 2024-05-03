@@ -8,7 +8,7 @@ export default function CollectionEmpty() {
       <>
   <div className={styles['mainarea-desktop-collection']} >
     <div className={styles['emptycontent']} >
-      <p>您還未收藏任何商品</p>
+      <p>您尚未有任何一筆訂單</p>
     </div>
     <div className={styles['sbtn']}>
       <a href="">前往購物</a>
@@ -16,7 +16,7 @@ export default function CollectionEmpty() {
   </div>
   <div className={styles['lesson-mobile']} >
     <div className={styles['emptycontent']}>
-      <p>您還未收藏任何商品</p>
+      <p>您尚未有任何一筆訂單</p>
     </div>
     <div className={styles['sbtn']}>
       <a href="">前往購物</a>
@@ -32,8 +32,10 @@ CollectionEmpty.getLayout = function (page) {
 };
 
 
-         
-         
 
 
-   
+
+
+
+
+

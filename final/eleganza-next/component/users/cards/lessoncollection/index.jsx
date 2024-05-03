@@ -1,10 +1,10 @@
 import React from 'react'
 import styles from './lessoncollection.module.scss'
 
-export default function LessonCollection() {
+export default function LessonCollectionCard() {
   return (
     <>
-        <div className={styles['productcard']} >
+        <div className={`${styles['productcard']} ${styles['desktop-only']}`}>
             <a href="">
                 <img
                 src="/images/teacher_images/WuJunyan.jpg"
@@ -42,7 +42,7 @@ export default function LessonCollection() {
                 </ul>
             </div>
             </div>
-        <div className={styles['productcard']}>
+            <div className={`${styles['productcard']} ${styles['mobile-only']}`}>
                 <img
                     src="/images/teacher_images/WuJunyan.jpg"
                     alt=""

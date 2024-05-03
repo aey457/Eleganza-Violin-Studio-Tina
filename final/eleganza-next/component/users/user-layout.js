@@ -30,7 +30,7 @@ export default function UserLayout({ children }) {
                 <div className={styles['main']}>
                     {/* 條件渲染 SideNav */}
                     {shouldRenderSideNav && <SideNav />}
-                    <main>{children}</main>
+                    {children}
                 </div>
             </div>
             <Footer />

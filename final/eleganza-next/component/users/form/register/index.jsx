@@ -1,13 +1,13 @@
 import React from 'react'
 import styles from './register.module.scss'
 
-export default function Register() {
+export default function RegisterForm() {
   return (
     <>
         <div className={styles.overlaybg}  >
             <div className={styles.popupwindow} >
                 <a href="">
-                <img src="@public/icons/icon-x.svg" alt="" />
+                <img src="/icons/icon-x.svg" alt="" />
                 </a>
                 <div className={styles.formwrap} >
                 <div className={styles.logo} >

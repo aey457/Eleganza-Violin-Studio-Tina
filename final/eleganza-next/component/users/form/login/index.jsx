@@ -1,13 +1,13 @@
 import React from 'react'
 import styles from './login.module.scss'
 
-export default function Login() {
+export default function LoginForm() {
   return (
     <>
         <div className={styles.overlaybg}  >
             <div className={styles.popupwindow} >
                 <a href="">
-                <img src="./icons/icon-x.svg" alt="" />
+                <img src="/icons/icon-x.svg" alt="" />
                 </a>
                 <div className={styles.formwrap} >
                 <div className={styles.logo} >

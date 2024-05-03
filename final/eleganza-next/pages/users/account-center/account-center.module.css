@@ -1,3 +1,15 @@
+.main{
+   display: flex;
+   flex-direction: row;
+   align-items: flex-start;
+   gap: 40px;
+   margin-bottom: 48px;
+   @media (max-width:1024px) {
+      padding-inline: 20px;
+      margin-bottom: 48px;
+   }
+}
+
 .mainarea-mobile{
    display: none;
 }
@@ -125,6 +137,7 @@
     flex: 1 0 0;
     align-items: flex-start;
     gap: 32px;
+    margin-bottom: 48px;
     @media (max-width:1024px) {
        display: none;
     }

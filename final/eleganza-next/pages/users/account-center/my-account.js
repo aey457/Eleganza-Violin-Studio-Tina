@@ -7,10 +7,7 @@ export default function MyAccount() {
    return (
       
       <>
-      <Head>
-        <title>My Account</title>
-        <meta name="viewport" content="width=device-width" />
-      </Head>
+
       <div>
          <div className={styles['mainarea-desktop']}>
          <div>

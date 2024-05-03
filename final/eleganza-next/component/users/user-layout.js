@@ -25,14 +25,18 @@ export default function UserLayout({ children }) {
                 <meta name="viewport" content="width=device-width" />
             </Head>
             <Header />
-            <Breadcrumb />
-            <div className="wrap flex-grow-1">
-                <div className={styles['main']}>
-                    {/* 條件渲染 SideNav */}
-                    {shouldRenderSideNav && <SideNav />}
-                    {children}
-                </div>
+            <div className= {styles['custom-breadcrumb']} >
+                <Breadcrumb />
             </div>
+                <div className="wrap flex-grow-1">
+                    <div className={styles['main']}>
+                        {/* 條件渲染 SideNav */}
+                        {shouldRenderSideNav && <SideNav />}
+                        {children}
+                    </div>
+                </div>
+            
+
             <Footer />
         </>
     );

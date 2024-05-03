@@ -1,4 +1,8 @@
-
+.custom-breadcrumb {
+   margin-left: 300px;
+   display: flex;
+   flex-direction: column;
+}
 
 .main{
     display: flex;
@@ -12,3 +16,7 @@
        padding-inline: 20px;
     }
  }
+
+ .tabs-desktop {
+   margin-left: 300px;
+}

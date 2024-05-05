@@ -32,7 +32,7 @@ export default function LessonCollection() {
 }
 
 LessonCollection.getLayout = function (page) {
-   return <UserLayout>{page}</UserLayout>;
+   return <UserLayout currentPage="收藏內容">{page}</UserLayout>;
 };
 
 

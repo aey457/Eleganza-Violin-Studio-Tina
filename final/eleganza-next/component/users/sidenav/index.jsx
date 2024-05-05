@@ -1,7 +1,11 @@
+import { useState } from 'react';
 import React from 'react'
 import styles from './sidenav.module.scss'
 
 export default function SideNav() {
+  const [currentPage, setCurrentPage] = useState('我的帳號'); // 預設為我的帳號頁面
+
+
   return (
     <>
       <div className={styles['sidenav-desktop']}>
@@ -15,18 +19,26 @@ export default function SideNav() {
         <hr />
         <ul className={`list-unstyled ${styles['accountform']}`}>
           <li>
-            <a className={styles['sidenavselected']} href="">
+            <a href="#"
+              onClick={() => setCurrentPage('我的帳號')}
+              className={currentPage === '我的帳號' ? styles['sidenavselected'] : ''}>
               我的帳號
             </a>
           </li>
           <li>
-            <a href="">我的課程</a>
+            <a href="#"
+              onClick={() => setCurrentPage('我的課程')}
+              className={currentPage === '我的課程' ? styles['sidenavselected'] : ''}>我的課程</a>
           </li>
           <li>
-            <a href="">收藏內容</a>
+            <a href="#"
+              onClick={() => setCurrentPage('收藏內容')}
+              className={currentPage === '收藏內容' ? styles['sidenavselected'] : ''}>收藏內容</a>
           </li>
           <li>
-            <a href="">歷史訂單</a>
+            <a href="#"
+              onClick={() => setCurrentPage('歷史訂單')}
+              className={currentPage === '歷史訂單' ? styles['sidenavselected'] : ''}>歷史訂單</a>
           </li>
           <li>
             <a className={styles['sidenavlogout']} href="">
@@ -51,25 +63,33 @@ export default function SideNav() {
         </ul>
         <ul className={`list-unstyled ${styles['accountform-mobile']}`}>
           <li>
-            <a className={styles['sidenavselected']} href="#">
+            <a href="#"
+              onClick={() => setCurrentPage('我的帳號')}
+              className={currentPage === '我的帳號' ? styles['sidenavselected'] : ''}>
               我的帳號
               <img src="./icons/icon-chevron-right.svg" alt="" />
             </a>
           </li>
           <li>
-            <a href="">
+            <a href="#"
+              onClick={() => setCurrentPage('我的課程')}
+              className={currentPage === '我的課程' ? styles['sidenavselected'] : ''}>
               我的課程
               <img src="./icons/icon-chevron-right.svg" alt="" />
             </a>
           </li>
           <li>
-            <a href="">
+            <a href="#"
+              onClick={() => setCurrentPage('收藏內容')}
+              className={currentPage === '收藏內容' ? styles['sidenavselected'] : ''}>
               收藏內容
               <img src="./icons/icon-chevron-right.svg" alt="" />
             </a>
           </li>
           <li>
-            <a href="">
+            <a href="#"
+              onClick={() => setCurrentPage('歷史訂單')}
+              className={currentPage === '歷史訂單' ? styles['sidenavselected'] : ''}>
               歷史訂單
               <img src="./icons/icon-chevron-right.svg" alt="" />
             </a>

@@ -35,6 +35,6 @@ export default function MyLesson() {
 }
 
 MyLesson.getLayout = function (page) {
-   return <UserLayout>{page}</UserLayout>;
+   return <UserLayout currentPage="我的課程">{page}</UserLayout>;
 };
 

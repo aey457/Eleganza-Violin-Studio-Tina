@@ -25,7 +25,7 @@ export default function OrderHistoryUnfold() {
 }
 
 OrderHistoryUnfold.getLayout = function (page) {
-   return <UserLayout>{page}</UserLayout>;
+   return <UserLayout currentPage="歷史訂單">{page}</UserLayout>;
 };
 
 

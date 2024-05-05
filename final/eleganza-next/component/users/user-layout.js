@@ -6,7 +6,7 @@ import styles from './main.module.scss';
 import SideNav from './sidenav';
 import Breadcrumb from './breadcrumb';
 
-export default function UserLayout({ children }) {
+export default function UserLayout({ currentPage, children }) {
     const [windowWidth, setWindowWidth] = useState(0);
 
     useEffect(() => {
@@ -26,7 +26,7 @@ export default function UserLayout({ children }) {
             </Head>
             <Header />
             <div className= {styles['custom-breadcrumb']} >
-                <Breadcrumb />
+                <Breadcrumb currentPage={currentPage}/>
             </div>
                 <div className="wrap flex-grow-1">
                     <div className={styles['main']}>

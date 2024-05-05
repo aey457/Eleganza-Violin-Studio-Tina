@@ -70,12 +70,19 @@
  }
  .orderhistorydetailrow{
     display: flex;
-    padding: 0px 20px; 
+    padding: 0px 20px 20px 20px; 
     justify-content: space-between;
     align-items: center;
     gap: 52px;
     align-self: stretch;
     margin: 20px 0;
+    border-bottom: 0.5px solid var(--color-primary-medium);
+    @media (max-width: 1024px) {
+      flex-direction: column;
+      gap: 0;
+      margin: 0;
+      padding: 0 0;
+    }
  }
  /* .orderdetailleft{
     display: flex;
@@ -105,6 +112,16 @@
        flex-wrap: wrap; 
        gap: auto;
        border-bottom: 0.5px solid var(--color-primary-medium); 
+    }
+    &.desktop-only {
+      @media (max-width: 1024px) {
+        display: none;
+      }
+    }
+    &.mobile-only {
+      @media (min-width: 1025px) {
+        display: none;
+      }
     }
  }
  .orderimg{
@@ -195,6 +212,16 @@
        padding: 10px 20px;
        height: fit-content;
     }
+    &.desktop-only {
+      @media (max-width: 1024px) {
+        display: none;
+      }
+    }
+    &.mobile-only {
+      @media (min-width: 1025px) {
+        display: none;
+      }
+    }
  }
  .creditcard{
     display: flex;
@@ -234,7 +261,7 @@
        width: 20px;
     }
  }
- .mobile-total{
+ .mobiletotal{
     display: none;
     @media (max-width:1024px) {
        display: flex;
@@ -242,7 +269,7 @@
        justify-content: space-between;
        align-items: flex-end;
        align-self: stretch;
-       border-bottom: 0.5px solid var(--stroke, #9C9191);
+      //  border-bottom: 0.5px solid var(--stroke, #9C9191);
        & p{
           color: var(--color-text-dark);
           font-family: var(--font-inter);
@@ -252,5 +279,15 @@
           line-height: normal;
           margin: 0;
        }
-       }
+   }
+   &.desktop-only {
+      @media (max-width: 1024px) {
+        display: none;
+      }
+   }
+   &.mobile-only {
+      @media (min-width: 1025px) {
+        display: none;
+      }
+   }
  }

@@ -28,7 +28,7 @@ export default function CollectionEmpty() {
 }
 
 CollectionEmpty.getLayout = function (page) {
-   return <UserLayout>{page}</UserLayout>;
+   return <UserLayout currentPage="歷史訂單">{page}</UserLayout>;
 };
 
 

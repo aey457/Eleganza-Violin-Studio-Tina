@@ -1,10 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import React from 'react'
 import styles from './sidenav.module.scss'
 
 export default function SideNav() {
   const [currentPage, setCurrentPage] = useState('我的帳號'); // 預設為我的帳號頁面
+  const [isSideNavVisible, setIsSideNavVisible] = useState(false);
 
+   const toggleSideNav = () => {
+    setIsSideNavVisible(!isSideNavVisible);
+  };
 
   return (
     <>
@@ -47,7 +51,7 @@ export default function SideNav() {
           </li>
         </ul>
       </div>
-      <div className={styles['sidenav-mobile']}>
+      <div className={`${styles['sidenav-mobile']} ${isSideNavVisible ? styles['show'] : styles['hide']}`}>
         <ul className={`list-unstyled ${styles['accountname']}`}>
           <li className="">
             <div

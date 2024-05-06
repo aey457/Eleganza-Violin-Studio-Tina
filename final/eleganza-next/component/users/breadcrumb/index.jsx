@@ -1,7 +1,14 @@
 import React from 'react';
 import styles from './breadcrumb.module.scss';
+import { useState, useEffect } from 'react';
 
-export default function Breadcrumb({ currentPage }) {
+export default function Breadcrumb({ currentPage, handleIconClick }) {
+  
+  // const [isSideNavVisible, setIsSideNavVisible] = useState(false);
+  // const toggleSideNav = () => {
+  //   setIsSideNavVisible(!isSideNavVisible);
+  // };
+
   return (
     <>
       <div className={styles['tabs-desktop']}>
@@ -20,7 +27,7 @@ export default function Breadcrumb({ currentPage }) {
       <div className={styles['tabs-mobile']}>
         <ul className={`list-unstyled`}>
           <li>
-            <a href="#">
+            <a href="#" onClick={handleIconClick}>
               <img src="/icons/icon-chevron-left.svg" alt="" />
             </a>
             {currentPage}

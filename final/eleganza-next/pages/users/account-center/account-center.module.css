@@ -4,9 +4,11 @@
    align-items: flex-start;
    gap: 40px;
    margin-bottom: 48px;
+   width: 100%;
    @media (max-width:1024px) {
       padding-inline: 20px;
       margin-bottom: 48px;
+      width: 100%;
    }
 }
 
@@ -65,10 +67,10 @@
       flex-direction: row;
       justify-content: space-between;
       vertical-align:text-bottom;
-      align-items: flex-start;
+      align-items: center;
       gap: 40px;
       min-width: 375px; 
-      
+      align-self: stretch;
    }
       .formkey{
          color: var(--color-text-medium);

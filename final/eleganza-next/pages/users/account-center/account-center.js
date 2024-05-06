@@ -32,8 +32,8 @@ export default function AccountCenter({ userId=1 }) {
                   <p>手機號碼</p>
                </div>
                <div className={styles['formvalue']} >
-                  <p>{userDetails?.user_account}</p>
-                  <p>0987987452</p>
+                  <p>{userDetails?.user_email}</p>
+                  <p>{userDetails?.user_phone}</p>
                </div>
                </div>
             </div>
@@ -46,9 +46,9 @@ export default function AccountCenter({ userId=1 }) {
                   <p>顯示名稱</p>
                </div>
                <div className={styles['formvalue']}>
-               <input className={styles['formstyle']} type="text" defaultValue="王貫中" />
-               <input className={styles['formstyle']} type="text" defaultValue="0987987452" /> {/* 將數字轉換為字串 */}
-               <input className={styles['formstyle']} type="text" defaultValue="Fanny456" />
+               <input className={styles['formstyle']} type="text" defaultValue={userDetails?.user_name} />
+               <input className={styles['formstyle']} type="text" defaultValue={userDetails?.user_phone} /> {/* 將數字轉換為字串 */}
+               <input className={styles['formstyle']} type="text" defaultValue={userDetails?.user_account}/>
                </div>
                </div>
             </div>
@@ -61,7 +61,7 @@ export default function AccountCenter({ userId=1 }) {
                   <p>密碼確認</p>
                </div>
                <div className={styles['formvalue']}>
-                  <input className={styles['formstyle']} type="password" defaultValue="" />
+                  <input className={styles['formstyle']} type="password" defaultValue={userDetails?.user_password} />
                   <input className={styles['formstyle']} type="password" defaultValue="" />
                   <input className={styles['formstyle']} type="password" defaultValue="" />
                   <div className={styles['xsbtn']} >
@@ -91,8 +91,8 @@ export default function AccountCenter({ userId=1 }) {
                <p>手機號碼</p>
                </div>
                <div className={styles['formvalue']}>
-               <p>Fanny456@gmail.com</p>
-               <p>0987987452</p>
+               <p>{userDetails?.user_email}</p>
+               <p>{userDetails?.user_phone}</p>
                </div>
             </div>
             <p className={styles['maintitle']}>個人檔案</p>
@@ -103,9 +103,9 @@ export default function AccountCenter({ userId=1 }) {
                <p>顯示名稱</p>
                </div>
                <div className={styles['formvalue']}>
-               <input className={styles['formstyle']} type="text" defaultValue="王貫中" />
-               <input className={styles['formstyle']} type="text" defaultValue="0987987452" />
-               <input className={styles['formstyle']} type="text" defaultValue="Fanny456" />
+               <input className={styles['formstyle']} type="text" defaultValue={userDetails?.user_name} />
+               <input className={styles['formstyle']} type="text" defaultValue={userDetails?.user_phone} />
+               <input className={styles['formstyle']} type="text" defaultValue={userDetails?.user_account} />
                </div>
             </div>
             <p className={styles['maintitle']}>變更密碼</p>
@@ -116,7 +116,7 @@ export default function AccountCenter({ userId=1 }) {
                <p>密碼確認</p>
                </div>
                <div className={styles['formvalue']}>
-               <input className={styles['formstyle']} type="password" defaultValue="" />
+               <input className={styles['formstyle']} type="password" defaultValue={userDetails?.user_password} />
                <input className={styles['formstyle']} type="password" defaultValue="" />
                <input className={styles['formstyle']} type="password" defaultValue="" />
                </div>

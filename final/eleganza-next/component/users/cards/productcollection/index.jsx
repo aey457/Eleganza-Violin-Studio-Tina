@@ -26,7 +26,7 @@ export default function ProductCard({productId=2}) {
         <div className={`${styles['productcard']} ${isMobileButtonClicked ? styles['mobile-clicked'] : ''}`}>
             <a href="">
                 <img
-                    src={productDetails?.img}
+                    src="/images/product_images/17663193_800.jpg"
                     alt=""
                     className={styles['productcardimg']}
                 />

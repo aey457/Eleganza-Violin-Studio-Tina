@@ -61,7 +61,7 @@ export default function OrderHistoryUnfoldCard({orderId=2024010401}, {productId=
                     <div className={styles.orderhistorydetail} >
                         <div className={styles.orderimg} >
                             <a href="">
-                                <img src={productDetails?.img} alt="" />
+                                <img src="/images/product_images/17663193_800.jpg" alt="" />
                             </a>
                         </div>
                         <div className={styles.orderwords} >

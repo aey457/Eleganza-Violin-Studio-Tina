@@ -5,9 +5,9 @@ import 'dotenv/config.js';
 // 資料庫連結資訊
 const db = mysql.createPool({
     host: 'localhost',
-    user: 'admin',
+    user: 'Eleganza',
     port:  3306,
-    password: 'admin',
+    password: '12345',
     database: 'db_violin',
     // dateStrings: true,
 });

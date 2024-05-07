@@ -21,7 +21,7 @@ export default function LessonCollectionCard({lessonId=201}) {
         <div className={`${styles['productcard']} ${styles['desktop-only']}`}>
             <a href="">
                 <img
-                src={lessonDetails?.course_img}
+                src="/images/course_images/2.Wu Junyan.jpg"
                 alt=""
                 className={styles['productcardimg']} 
                 />
@@ -58,7 +58,7 @@ export default function LessonCollectionCard({lessonId=201}) {
             </div>
             <div className={`${styles['productcard']} ${styles['mobile-only']}`}>
                 <img
-                    src={lessonDetails?.course_img}
+                    src="/images/course_images/2.Wu Junyan.jpg"
                     alt=""
                     className={styles['productcardimg']}
                 />

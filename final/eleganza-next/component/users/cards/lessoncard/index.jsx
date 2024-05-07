@@ -19,7 +19,7 @@ export default function LessonCard({lessonId=2701}) {
     <>
     <div className={styles['lessoncard']}>
         <img
-            src="/images/teacher_images/WuJunyan.jpg"
+            src={lessonDetails?.course_img}
             alt=""
             className={styles['lessoncardimg']}
         />

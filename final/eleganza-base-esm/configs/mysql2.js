@@ -4,7 +4,7 @@ import mysql from 'mysql2/promise.js'
 import 'dotenv/config.js'
 
 // 資料庫連結資訊
-const connection = mysql.createPool({
+const db = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USERNAME,
   port: process.env.DB_PORT,
@@ -14,4 +14,4 @@ const connection = mysql.createPool({
 })
 
 // 輸出模組
-export default connection
+export default db

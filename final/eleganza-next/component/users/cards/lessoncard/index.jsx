@@ -1,7 +1,20 @@
-import React from 'react'
+import { useState, useEffect } from 'react';
+import React from 'react';
 import styles from './lessoncard.module.scss'
 
-export default function LessonCard() {
+export default function LessonCard({lessonId=2701}) {
+    const [lessonDetails, setLessonDetails] = useState(null);
+
+    useEffect(() => {
+        // 向後端 API 端點發送請求獲取使用者資料
+        fetch(`http://localhost:3005/api/my-lessoncollection/${lessonId}`)
+          .then((response) => response.json())
+          .then((data) => {
+            setLessonDetails(data.lessonDetails);
+          })
+          .catch((error) => console.error('Error fetching lesson details:', error));
+      }, [lessonId]); 
+
   return (
     <>
     <div className={styles['lessoncard']}>
@@ -15,12 +28,12 @@ export default function LessonCard() {
             <li className={styles['lessondate']} >2024/11/4</li>
             <li>
                 <a className={styles['lessonname']} href="">
-                小提琴演奏初階個別課
+                {lessonDetails?.course_name}
                 </a>
             </li>
             <li>
                 <a className={styles['teachername']} href="">
-                伍俊彥 教師
+                {lessonDetails?.course_teacher_name} 教師
                 </a>
             </li>
             </ul>

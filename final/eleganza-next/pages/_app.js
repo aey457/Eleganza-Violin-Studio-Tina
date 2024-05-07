@@ -1,5 +1,6 @@
 import '@/styles/globals.scss'
-import DefaultLayout from '@/component/default-layout'
+import DefaultLayout from '@/component'
+
 
 export default function App({ Component, pageProps }) {
   const getLayout =

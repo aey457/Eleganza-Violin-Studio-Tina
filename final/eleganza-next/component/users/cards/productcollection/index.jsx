@@ -1,8 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import React from 'react';
 import styles from './productcollection.module.scss';
 
-export default function ProductCard() {
+export default function ProductCard({productId=2}) {
+    const [productDetails, setProductDetails] = useState(null);
+   
+ 
+   useEffect(() => {
+     // 向後端 API 端點發送請求獲取使用者資料
+     fetch(`http://localhost:3005/api/my-productcollection/${productId}`)
+       .then((response) => response.json())
+       .then((data) => {
+         setProductDetails(data.productDetails);
+       })
+       .catch((error) => console.error('Error fetching product details:', error));
+   }, [productId]); 
+
     const [isMobileButtonClicked, setIsMobileButtonClicked] = useState(false);
 
     const handleMobileButtonClick = () => {
@@ -13,7 +26,7 @@ export default function ProductCard() {
         <div className={`${styles['productcard']} ${isMobileButtonClicked ? styles['mobile-clicked'] : ''}`}>
             <a href="">
                 <img
-                    src="/images/product_images/6746845_800.jpg"
+                    src={productDetails?.img}
                     alt=""
                     className={styles['productcardimg']}
                 />
@@ -21,16 +34,16 @@ export default function ProductCard() {
             <div className={styles['product-word']}>
                 <ul className={`${styles.productcardtitle} list-unstyled`}>
                     <li className={styles['productbranding']}>
-                        <a href="">Karl Höfner</a>
+                        <a href="">{productDetails?.brand}</a>
                     </li>
                     <li>
                         <a className={styles['productname']} href="">
-                            Allegro 3/4 Violin Outfit
+                            {productDetails?.name}
                         </a>
                     </li>
                 </ul>
                 <ul className={`${styles['productcard-function']} list-unstyled`}>
-                    <li className={styles['productprice']}>$8,5000</li>
+                    <li className={styles['productprice']}>{productDetails?.product_price}</li>
                     <a className={styles['icon-mobile']} href="#" onClick={handleMobileButtonClick}>
                         <img src="/icons/icon-chevron-right.svg" alt="手機版" />
                     </a>

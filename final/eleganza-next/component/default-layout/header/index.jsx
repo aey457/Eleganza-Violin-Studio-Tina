@@ -1,5 +1,6 @@
 import React from 'react'
 import styles from './header.module.scss'
+import Link from 'next/link'
 
 export default function Header() {
   return (
@@ -25,7 +26,7 @@ export default function Header() {
               <a href="">師資陣容</a>
             </li>
             <li className={styles.link}>
-              <a href="">弦樂專欄</a>
+              <Link href="/article">弦樂專欄</Link>
             </li>
           </ul>
           <div

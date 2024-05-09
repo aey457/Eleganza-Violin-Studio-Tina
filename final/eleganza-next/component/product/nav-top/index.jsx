@@ -9,6 +9,10 @@ export default function NavTop({
   setProducts,
   checkboxStatus,
   handleCheckboxStatus,
+  setCheckboxStatus,
+  cates,
+  setProductCate,
+  productCate
 }) {
   // 搜尋框動畫
   //   const [showInput, setShowInput] = useState(false)
@@ -22,14 +26,21 @@ export default function NavTop({
     setSelectedOption(option)
   }
 
+  //   const [checkboxStatus, setCheckboxStatus] = useState(false)
+  //   const handleCheckboxStatus = (option) => {
+  //     setCheckboxStatus((prevStatus) => ({
+  //       ...prevStatus,
+  //       [option]: !prevStatus[option],
+  //     }))
+  //   }
+
   // 商品類別篩選
-  const [productCate, setProductCate] = useState(0)
-  const cates = ['所有商品', '小提琴', '提琴盒', '提琴弓', '松香']
+
   const handleCateClick = async (cateIndex) => {
     setProductCate(cateIndex)
-    const cateUrl = `http://localhost:3005/api/products`
+    const url = `http://localhost:3005/api/products`
     try {
-      const res = await fetch(cateUrl, {
+      const res = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -41,7 +52,8 @@ export default function NavTop({
 
       if (Array.isArray(data.data.products)) {
         setProducts(data.data.products)
-      //   console.log('success')
+        setCheckboxStatus(false)
+        //   console.log('success')
       } else {
         alert('u mom is dead')
       }
@@ -50,6 +62,7 @@ export default function NavTop({
     }
   }
   // console.log(productCate)
+  //   console.log(checkboxStatus)
 
   return (
     <>
@@ -71,13 +84,6 @@ export default function NavTop({
                   </div>
                 )
               })}
-              {/* <div className={`${styles['cate-btn']} ${styles['current']}`}>
-                所有商品
-              </div>
-              <div className={styles['cate-btn']}>小提琴</div>
-              <div className={styles['cate-btn']}>提琴盒</div>
-              <div className={styles['cate-btn']}>提琴弓</div>
-              <div className={styles['cate-btn']}>松香</div> */}
             </div>
             <div className="d-none d-md-block d-flex align-content-center">
               <div
@@ -149,6 +155,9 @@ export default function NavTop({
                   products={products}
                   checkboxStatus={checkboxStatus}
                   handleCheckboxStatus={handleCheckboxStatus}
+                  productCate={productCate}
+                  // setProductCate={setProductCate}
+                  // cates={cates}
                 />
               </div>
             </div>

@@ -44,7 +44,7 @@
          cursor: pointer; /* 添加指针样式，表明可点击 */
       }
 
-   .xsbtn a {
+   .xsbtn button {
          text-decoration: none;
          color: var(--color-text-light);
          font-family: var(--font-noto-sans);

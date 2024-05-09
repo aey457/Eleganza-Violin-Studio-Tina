@@ -14,16 +14,16 @@ export default function Header() {
             className={`d-flex justify-content-between align-content-center list-unstyled m-0`}
           >
             <li className={styles.link}>
-              <a href="">關於阿爾扎</a>
+              <a href="/">關於阿爾扎</a>
             </li>
             <li className={styles.link}>
-              <a href="">商品總覽</a>
+              <Link href="/products">商品總覽</Link>
             </li>
             <li className={styles.link}>
-              <a href="">精選課程</a>
+              <Link href="/course">精選課程</Link>
             </li>
             <li className={styles.link}>
-              <a href="">師資陣容</a>
+              <Link href="/teacher">師資陣容</Link>
             </li>
             <li className={styles.link}>
               <Link href="/article">弦樂專欄</Link>

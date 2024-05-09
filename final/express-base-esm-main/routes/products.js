@@ -24,10 +24,10 @@ router.get('/', async function (req, res) {
 router.post('/', async function (req, res) {
   const { cateIndex } = req.body
   // console.log(req.body)
-  let productCateSql = `SELECT * FROM product WHERE product_category_id = ${cateIndex}`
-  if (cateIndex === 0) {
-    productCateSql = `SELECT * FROM product`
-  }
+  let productCateSql = `SELECT * FROM product WHERE product_category_id = ${cateIndex + 1}`
+  //   if (cateIndex === 0) {
+  //     productCateSql = `SELECT * FROM product`
+  //   }
   let [rows] = await db.query(productCateSql)
   try {
     res.json({
@@ -42,6 +42,7 @@ router.post('/', async function (req, res) {
 })
 
 // 商品詳細篩選
+router.get('/')
 
 // 單筆及推薦資料
 router.get('/:id', async function (req, res) {

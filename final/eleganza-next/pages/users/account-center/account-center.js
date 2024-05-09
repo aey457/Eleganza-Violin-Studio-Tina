@@ -3,28 +3,54 @@ import React from 'react';
 import Head from 'next/head'
 import styles from './account-center.module.css';
 import UserLayout from '@/component/users/user-layout';
+import { useRouter } from 'next/router';
 
-export default function AccountCenter({ userId=1 }) {
+export default function AccountCenter() {
    const [userDetails, setUserDetails] = useState(null);
-   
- 
+   const router = useRouter();
+
    useEffect(() => {
-     // 向後端 API 端點發送請求獲取使用者資料
-     fetch(`http://localhost:3005/api/home-myaccount/${userId}`)
-       .then((response) => response.json())
-       .then((data) => {
-         setUserDetails(data.userDetails);
-       })
-       .catch((error) => console.error('Error fetching user details:', error));
-   }, [userId]); // <-- Include userId in the dependency array
-   
+      const { userId } = router.query; // 從 URL 參數中獲取用戶 ID
+      if (userId) {
+         // 向後端 API 端點發送請求獲取使用者資料
+         fetch(`http://localhost:3005/api/home-myaccount/${userId}`)
+            .then((response) => response.json())
+            .then((data) => {
+               setUserDetails(data.userDetails);
+            })
+            .catch((error) => console.error('Error fetching user details:', error));
+      }
+   }, [router.query.userId]); 
+ 
+   const handleSave = () => {
+      // 將更新後的用戶資料發送到後端
+      fetch(`http://localhost:3005/api/home-myaccount/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_name: userDetails.user_name,
+          user_account: userDetails.user_account,
+          user_password: userDetails.user_password,
+          user_phone: userDetails.user_phone,
+          user_email: userDetails.user_email,
+        }),
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Update success:', data);
+        // 在更新成功後，你可以做一些額外的處理，例如顯示成功提示、重新加載用戶資料等
+      })
+      .catch((error) => console.error('Error updating user details:', error));
+    };
  
    return (
      <>
        <div className={styles['main']}>
          <div className={styles['mainarea-desktop']}>
          <div>
-            <div>
+            <form>
                <p className={styles['maintitle']} >帳號細節</p>
                <div className={styles['formdetail']} >
                <div className={styles['formkey']} >
@@ -36,7 +62,7 @@ export default function AccountCenter({ userId=1 }) {
                   <p>{userDetails?.user_phone}</p>
                </div>
                </div>
-            </div>
+            </form>
             <div>
                <p className={styles['maintitle']}>個人檔案</p>
                <div className={styles['formdetail']}>
@@ -74,7 +100,7 @@ export default function AccountCenter({ userId=1 }) {
          </div>
          
          <div className={styles['mainarea-mobile']} >
-         <div>
+         <form>
             <div
                style={{
                marginBottom: 20,
@@ -121,9 +147,9 @@ export default function AccountCenter({ userId=1 }) {
                <input className={styles['formstyle']} type="password" defaultValue="" />
                </div>
             </div>
-         </div>
+         </form>
          <div className={styles['xsbtn']}>
-            <a href="">儲存</a>
+            <button type="button" onClick={handleSave}>儲存</button>
          </div>
          </div>
          </div>

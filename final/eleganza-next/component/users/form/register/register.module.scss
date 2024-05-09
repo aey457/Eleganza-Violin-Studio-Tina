@@ -207,3 +207,8 @@
     background: var(--color-primary-light);
     border-radius: 50px;
  }
+ .error{
+   color: var(--color-danger);
+   margin-block: 0;
+   font-size: var(--fs-hint);
+ }

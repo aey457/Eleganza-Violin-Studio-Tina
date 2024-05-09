@@ -1,28 +1,32 @@
-import React from 'react'
-import styles from './navbar.module.scss'
+import React from 'react';
+import styles from './navbar.module.scss';
 
-export default function Navbar() {
+export default function Navbar({ onSelect }) {
+  const handleCourseSelect = (course) => {
+    onSelect(course);
+  };
+
   return (
     <>
       <nav className={styles.navbar}>
         <ul>
           <li>
-            <a href="#">全部課程</a>
+            <button className={styles.button} onClick={() => handleCourseSelect('全部課程')}>全部課程</button>
           </li>
           <li>
-            <a href="#">初階個別課</a>
+            <button className={styles.button} onClick={() => handleCourseSelect('初階個別課')}>初階個別課</button>
           </li>
           <li>
-            <a href="#">中階個別課</a>
+            <button className={styles.button} onClick={() => handleCourseSelect('中階個別課')}>中階個別課</button>
           </li>
           <li>
-            <a href="#">高階個別課</a>
+            <button className={styles.button} onClick={() => handleCourseSelect('高階個別課')}>高階個別課</button>
           </li>
           <li>
-            <a href="#">團體班</a>
+            <button className={styles.button} onClick={() => handleCourseSelect('團體班')}>團體班</button>
           </li>
           <li>
-            <a href="#">大師班</a>
+            <button className={styles.button} onClick={() => handleCourseSelect('大師班')}>大師班</button>
           </li>
         </ul>
         <div
@@ -43,7 +47,6 @@ export default function Navbar() {
         </div>
       </nav>
       <hr></hr>
-      {/* <div className={styles['navbar-divider']} /> */}
       <div className={styles['filter-container']}>
         <a className={styles.Filter} href="#">
           篩選條件
@@ -55,5 +58,5 @@ export default function Navbar() {
         </a>
       </div>
     </>
-  )
+  );
 }

@@ -10,7 +10,7 @@ export default function ProductCard({ img, price, name, brand }) {
             <div className="ratio ratio-1x1">
               <img
                 className={`${styles['obj-fit']}`}
-                src={`/product_images/${img}`}
+                src={`/images/product_images/${img}`}
                 alt=""
               />
             </div>

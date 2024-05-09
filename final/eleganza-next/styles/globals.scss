@@ -51,7 +51,7 @@ body {
   /* 防止與內容與header重疊 */
   padding-top: 80px;
 
-  @media (max-width: 992px) {
+  @media (max-width: 768px) {
     padding-top: 48px;
   }
 }
@@ -59,9 +59,8 @@ body {
 main {
   flex-grow: 1;
   max-width: 100%;
-  padding-inline: 300px;
-  font-family: var(--font-noto-sans);
-  @media (max-width: 1024px) {
+
+  @media (max-width: 768px) {
     padding-inline: 20px;
   }
 }

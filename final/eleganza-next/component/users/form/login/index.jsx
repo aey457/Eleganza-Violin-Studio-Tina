@@ -1,15 +1,15 @@
 import { useState } from 'react'
-import { useHistory } from 'react-router-dom';
 import React from 'react'
 import styles from './login.module.scss'
+import { useRouter } from 'next/router';
 
 export default function LoginForm() {
     const [user, setUser] = useState({
         useremail: '',
         password: '',
-    })
-
-    const [showPassword, setShowPassword] = useState(false)
+    });
+    const [showPassword, setShowPassword] = useState(false);
+    const router = useRouter();
 
     const handleFieldChange = (e) => {
         const { name, value } = e.target;
@@ -27,42 +27,65 @@ export default function LoginForm() {
     const [errors, setErrors] = useState({
         useremail: '',
         password: '',
-    })
+    });
     
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
     
         const newErrors = {
             useremail: '',
-            password: '',
-        }
+            password: ''
+        };
     
         if (!user.useremail) {
-            newErrors.useremail = '帳號為必填'
+            newErrors.useremail = '*帳號為必填';
         }
     
         if (!user.password) {
-            newErrors.password = '密碼為必填'
+            newErrors.password = '*密碼為必填';
         }
     
         setErrors(newErrors);
-
-        // if (Object.values(newErrors).every((v) => !v)) {
-        //     // 導航到目標頁面
-        //     history.push('/users/account-center/account-center');
-        // }
-    }
-
-    // if (Object.values(newErrors).some((v) => v)) {
-    //     setErrors(newErrors);
-    //     return;
-    // } else {
-    //     setErrors({
-    //         useremail: '',
-    //         password: '',
-    //     });
-    // }
     
+        if (user.useremail && user.password) {
+            try {
+                await loginUser(user.useremail, user.password);
+            } catch (error) {
+                console.error('Error occurred during login:', error);
+                alert('登入時發生錯誤');
+            }
+        }
+    };
+    
+    const loginUser = async (email, password) => {
+        try {
+            // 发送身份验证请求
+            const response = await fetch('http://localhost:3005/api/home-myaccount/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_email: email,
+                    user_password: password
+                })
+            });
+    
+            if (response.ok) {
+                // 登入成功，获取 userId 并跳转到 account-center 页面
+                const data = await response.json();
+                const userId = data.userId;
+                router.push(`/users/account-center/account-center?userId=${userId}`);
+            } else {
+                // 处理身份验证失败的情况
+                console.error('Login failed');
+                alert('登入失敗，請檢查帳號和密碼');
+            }
+        } catch (error) {
+            throw new Error('Error occurred during login:', error);
+        }
+    };
+
     return (
         <>
             <div className={styles.overlaybg}>
@@ -78,9 +101,7 @@ export default function LoginForm() {
                             <div className={styles.form}>
                                 <label className={styles.formkey}>Email</label>
                                 <input className={styles.formvalue} type="text" name="useremail" onChange={handleFieldChange} /> 
-                                <br />
-                                <span className="error">{errors.useremail}</span>
-                                <br />
+                                <span className={styles.error}>{errors.useremail}</span>
                             </div>
                             <div className={styles.form}>
                                 <div className={styles.passwordinput}>
@@ -90,9 +111,7 @@ export default function LoginForm() {
                                     </a>
                                 </div>
                                 <input className={styles.formvalue} type={showPassword ? 'text' : 'password'} name="password" onChange={handleFieldChange} />
-                                <br />
-                                <span className="error">{errors.password}</span>
-                                <br />
+                                <span className={styles.error}>{errors.password}</span>
                             </div>
                             <div className={styles.formcheck}>
                                 <div className={styles.checkloginstatus}>
@@ -101,7 +120,7 @@ export default function LoginForm() {
                                 </div>
                                 <a href="">忘記密碼？</a>
                             </div>
-                            <div className={styles.mbtn}>
+                            <div className={styles.mbtn} onClick={handleSubmit}>
                                 <button type="submit">登入</button>
                             </div>
                         </form>
@@ -112,5 +131,5 @@ export default function LoginForm() {
                 </div>
             </div>
         </>
-    )
+    );
 }

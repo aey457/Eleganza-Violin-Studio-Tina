@@ -122,7 +122,7 @@ router.post(
     // req.body 其它的文字欄位資料…
     // console.log(req.file, req.body)
 
-    if (req.file) {
+    if (req.file) {s
       const id = req.user.id
       const data = { avatar: req.file.filename }
 

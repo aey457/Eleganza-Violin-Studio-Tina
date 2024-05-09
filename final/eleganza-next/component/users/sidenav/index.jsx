@@ -1,10 +1,21 @@
 import { useState, useEffect } from 'react';
 import React from 'react'
 import styles from './sidenav.module.scss'
+import { useRouter } from 'next/router';
 
 export default function SideNav() {
   const [currentPage, setCurrentPage] = useState('我的帳號'); // 預設為我的帳號頁面
   const [isSideNavVisible, setIsSideNavVisible] = useState(false);
+  const router = useRouter();
+  const handleLogout = (e) => {
+    // 清除存储在浏览器中的 cookie 或本地存储
+    // 例如，清除名为 'authToken' 的 cookie 再研究，還沒刪掉cookie
+    e.preventDefault();
+    document.cookie = 'authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
+    // 重定向到登录页面或其他相关页面
+    router.push('/users/user-form/login'); // 将 '/login' 替换为你的登录页面路径
+};
 
    const toggleSideNav = () => {
     setIsSideNavVisible(!isSideNavVisible);
@@ -45,7 +56,7 @@ export default function SideNav() {
               className={currentPage === '歷史訂單' ? styles['sidenavselected'] : ''}>歷史訂單</a>
           </li>
           <li>
-            <a className={styles['sidenavlogout']} href="">
+            <a className={styles['sidenavlogout']} onClick={handleLogout} href="">
               登出
             </a>
           </li>

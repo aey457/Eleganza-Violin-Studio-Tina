@@ -11,7 +11,7 @@ export default function ProductPic({ product, picsArr }) {
             <div className=" ratio ratio-1x1">
               <img
                 className={`${styles['obj-fit']}`}
-                src={`/product_images/${product.img}`}
+                src={`/images/product_images/${product.img}`}
                 alt=""
               />
             </div>
@@ -28,7 +28,7 @@ export default function ProductPic({ product, picsArr }) {
                   <img
                     className={`my-1`}
                     key={i}
-                    src={`/product_images/${v}`}
+                    src={`/images/product_images/${v}`}
                     alt=""
                   />
                 )

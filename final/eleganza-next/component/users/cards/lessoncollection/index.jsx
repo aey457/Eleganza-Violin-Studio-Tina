@@ -4,7 +4,7 @@ import styles from './lessoncollection.module.scss'
 
 export default function LessonCollectionCard({lessonId=201}) {
     const [lessonDetails, setLessonDetails] = useState(null);
-   
+    const [lessoncollections, setlessoncollections] = useState([])
  
    useEffect(() => {
      // 向後端 API 端點發送請求獲取使用者資料
@@ -16,8 +16,36 @@ export default function LessonCollectionCard({lessonId=201}) {
        .catch((error) => console.error('Error fetching lesson details:', error));
    }, [lessonId]); 
 
+//    useEffect(() => {
+//     // 向後端 API 端點發送請求獲取使用者資料
+//     fetch(`http://localhost:3005/api/my-lessoncollection/lessoncollection/${userId}`)
+//       .then((response) => response.json())
+//       .then((data) => {
+//         setLessonCollectionDetails(data.collections);
+//       })
+//       .catch((error) => console.error('Error fetching lesson details:', error));
+//   }, [userId]); 
+
+    const getLessoncollections = async () => {
+        const url =
+        'http://localhost:3005/api/my-lessoncollection/lessoncollection/${userId}'
+        const res = await fetch(url)
+        // 解析json格式資料成js的資料
+        const data = await res.json()
+
+        console.log(data)
+        setlessoncollections(data)
+    }
+
+    useEffect(() => {
+        // 頁面初次渲染之後伺服器要求資料
+        setlessoncollections()
+      }, [])
+
+
   return (
     <>
+        
         <div className={`${styles['productcard']} ${styles['desktop-only']}`}>
             <a href="">
                 <img

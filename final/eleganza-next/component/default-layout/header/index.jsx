@@ -38,7 +38,7 @@ export default function Header() {
             <a href="">
               <img className={styles.cart} src="/icons/icon-cart-white.svg" />
             </a>
-            <a href="">
+            <a href="/users/user-form/login">
               <img
                 className={styles.account}
                 src="/icons/icon-user-white.svg"

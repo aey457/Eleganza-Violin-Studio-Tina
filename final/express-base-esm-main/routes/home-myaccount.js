@@ -105,18 +105,8 @@ router.get('/:userId', async (req, res) => {
 router.put('/:userId', authenticate, async function (req, res) {
   const id = getIdParam(req);
 
-  // 檢查是否為授權會員，只有授權會員可以存取自己的資料
-  if (req.user.id !== id) {
-    return res.json({ status: 'error', message: '存取會員資料失敗' });
-  }
-
   // user 為來自前端的會員資料(準備要修改的資料)
-  const user = req.body;
-
-  // 檢查從前端瀏覽器來的資料，哪些為必要(name, ...)
-  if (!id || !user.user_name || !user.user_account || !user.user_phone || !user.user_email) {
-    return res.json({ status: 'error', message: '缺少必要資料' });
-  }
+  const updatedUserData = req.body;
 
   try {
     // 查詢資料庫目前的資料
@@ -125,21 +115,20 @@ router.put('/:userId', authenticate, async function (req, res) {
 
     // null 代表不存在
     if (!dbUser) {
-      return res.json({ status: 'error', message: '使用者不存在' });
+      return res.status(404).json({ status: 'error', message: '使用者不存在' });
     }
 
     // 更新資料庫的資料
     const updateQuery = `
       UPDATE users 
-      SET user_name=?, user_account=?, user_password=?, user_phone=?, user_email=?
+      SET user_name=?, user_account=?, user_password=?, user_phone=?
       WHERE user_id=?
     `;
     await db.query(updateQuery, [
-      user.user_name,
-      user.user_account,
-      user.user_password,
-      user.user_phone,
-      user.user_email,
+      updatedUserData.user_name,
+      updatedUserData.user_account,
+      updatedUserData.user_password,
+      updatedUserData.user_phone,
       id
     ]);
 
@@ -151,7 +140,7 @@ router.put('/:userId', authenticate, async function (req, res) {
     delete updatedUser.user_password;
 
     // 回傳更新後的會員資料
-    return res.json({ status: 'success', data: { user: updatedUser } });
+    return res.json({ status: 'success', data: { updatedUser } });
   } catch (error) {
     console.error('更新會員資料時發生錯誤:', error);
     return res.status(500).json({ status: 'error', message: '伺服器錯誤' });

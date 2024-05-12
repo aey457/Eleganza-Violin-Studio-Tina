@@ -9,15 +9,8 @@ export default function OrderHistoryUnfold() {
       <>
   <div className={styles['mainarea-desktop-collection']}>
     <OrderHistoryUnfoldCard/>
-    <OrderHistoryUnfoldCard/>
-    <OrderHistoryUnfoldCard/>
-    <OrderHistoryUnfoldCard/>
-    <OrderHistoryUnfoldCard/>
   </div>
   <div className={styles['lesson-mobile']} >
-   <OrderHistoryUnfoldCard/>
-   <OrderHistoryUnfoldCard/>
-   <OrderHistoryUnfoldCard/>
    <OrderHistoryUnfoldCard/>
   </div>
 </>

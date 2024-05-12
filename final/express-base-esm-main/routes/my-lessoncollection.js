@@ -68,6 +68,130 @@ router.get('/lessoncollection/:userId', async (req, res) => {
   }
 });
 
+router.get('/productcollection/:userId', async (req, res) => {
+  const userId = req.params.userId;
+
+  let sql = `
+    SELECT 
+      product.*, 
+      users.user_id AS user_id
+    FROM 
+      product_likes
+    JOIN 
+      product ON product_likes.product_id = product.product_id 
+    JOIN
+      users ON product_likes.user_id = users.user_id 
+    WHERE 
+      product_likes.user_id = ?
+    ORDER BY 
+      product_likes.product_like_id;
+  `;
+
+  try {
+    const [pcollections] = await db.query(sql, [userId]);
+    res.json({ pcollections });
+  } catch (error) {
+    console.error('獲取使用者產品收藏時發生錯誤:', error);
+    res.status(500).json({ message: '伺服器錯誤' });
+  }
+});
+
+router.get('/lessonorder/:userId', async (req, res) => {
+  const userId = req.params.userId;
+
+  let sql = `
+    SELECT 
+        course.*, 
+        teacher.t_name AS course_teacher_name,
+        users.user_id AS user_id
+    FROM 
+        \`order_detail\`
+    JOIN 
+        \`order\` ON \`order_detail\`.order_id = \`order\`.order_id
+    JOIN 
+        users ON \`order\`.user_id = users.user_id
+    JOIN 
+        course ON \`order_detail\`.course_id = course.course_id 
+    JOIN 
+        teacher ON course.teacher_id = teacher.teacher_id
+    WHERE 
+        \`order\`.user_id = ?
+    ORDER BY 
+        \`order_detail\`.order_id;
+`;
+
+  try {
+    const [corders] = await db.query(sql, [userId]);
+    res.json({ corders });
+  } catch (error) {
+    console.error('獲取使用者購買課程時發生錯誤:', error);
+    res.status(500).json({ message: '伺服器錯誤' });
+  }
+});
+
+//不同使用者的訂單細節產品部分 還要再關聯order_detail
+router.get('/productorder/:userId', async (req, res) => {
+  const userId = req.params.userId;
+
+  let sql = `
+  SELECT 
+      product.*, 
+      users.user_id AS user_id,
+      \`order\`.order_id,
+      SUM(order_detail.num) AS total_quantity
+  FROM 
+      \`order\`
+  JOIN 
+      users ON \`order\`.user_id = users.user_id
+  LEFT JOIN 
+      \`order_detail\` ON \`order\`.order_id = \`order_detail\`.order_id
+  JOIN 
+      product ON \`order_detail\`.product_id = product.product_id 
+  WHERE 
+      \`order\`.user_id = ?
+  GROUP BY
+      \`order\`.order_id
+  ORDER BY 
+      \`order\`.order_id;
+`;
+
+  try {
+    const [porders] = await db.query(sql, [userId]);
+    res.json({ porders });
+  } catch (error) {
+    console.error('獲取使用者購買產品時發生錯誤:', error);
+    res.status(500).json({ message: '伺服器錯誤' });
+  }
+});
+
+// 不同使用者的訂單order
+router.get('/productorder2/:userId', async (req, res) => {
+  const userId = req.params.userId;
+
+  let sql = `
+    SELECT 
+        \`order\`.*, 
+        users.user_id AS user_id
+    FROM 
+        \`order_detail\`
+    JOIN 
+        \`order\` ON \`order_detail\`.order_id = \`order\`.order_id
+    JOIN 
+        users ON \`order\`.user_id = users.user_id
+    WHERE 
+        \`order\`.user_id = ?
+    ORDER BY 
+        \`order_detail\`.order_id;
+`;
+
+  try {
+    const [porders2] = await db.query(sql, [userId]);
+    res.json({ porders2 });
+  } catch (error) {
+    console.error('獲取使用者購買產品時發生錯誤:', error);
+    res.status(500).json({ message: '伺服器錯誤' });
+  }
+});
 
 
 export default router

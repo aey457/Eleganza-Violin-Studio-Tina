@@ -9,25 +9,16 @@ export default function ProductCollection() {
       <>
   <div className={styles['mainarea-desktop-collection']}>
     <ProductCollectionCard/>
-    <ProductCollectionCard/>
-    <ProductCollectionCard/>
-    <ProductCollectionCard/>
-    <ProductCollectionCard/>
-    <ProductCollectionCard/>
   </div>
   <div className={styles['lesson-mobile']} >
     <div className={styles['btn-mobile']} >
       <div className={styles['sbtn-selected']} >
-        <a href="">商品收藏</a>
+        <a href="/users/mobile-cardlayout/product-collection">商品收藏</a>
       </div>
       <div className={styles['sbtn']}>
-        <a href="">課程收藏</a>
+        <a href="/users/mobile-cardlayout/lesson-collection">課程收藏</a>
       </div>
     </div>
-    <ProductCollectionCard/>
-    <ProductCollectionCard/>
-    <ProductCollectionCard/>
-    <ProductCollectionCard/>
     <ProductCollectionCard/>
   </div>
 </>

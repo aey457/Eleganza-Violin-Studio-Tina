@@ -14,10 +14,10 @@ export default function Breadcrumb({ currentPage, handleIconClick }) {
       <div className={styles['tabs-desktop']}>
         <ul className={`list-unstyled`}>
           <li>
-            <a href="">首頁</a> /
+            <a href="http://localhost:3000/">首頁</a> /
           </li>
           <li>
-            <a href="">會員中心</a> /
+            <a href="/users/account-center/account-center?userId=">會員中心</a> /
           </li>
           <li className={styles['current']}>
             <a href="">{currentPage}</a>

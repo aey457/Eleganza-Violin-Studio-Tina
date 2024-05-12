@@ -70,7 +70,7 @@ export default function RegisterForm() {
             return;
         }
 
-    // 发送数据到后端
+        // 发送数据到后端
         try {
             const res = await fetch('http://localhost:3005/api/home-myaccount/register', {
                 method: 'POST',
@@ -82,9 +82,14 @@ export default function RegisterForm() {
             });
             const data = await res.json();
             console.log(data);
-
-            // 注册成功后重定向到登录页面
-            router.push('/users/user-form/login');
+        
+            if (res.ok) {
+                // 注册成功后重定向到登录页面
+                router.push('/users/user-form/login');
+                alert('註冊成功，請以新帳號密碼重新登入使用。');
+            } else {
+                alert('帳號註冊失敗，請再試一次。');
+            }
         } catch (error) {
             console.error('Error occurred during registration:', error);
             alert('註冊時發生錯誤');
@@ -102,6 +107,8 @@ export default function RegisterForm() {
         e.preventDefault();
         setShowPassword2((prevState) => !prevState);
     };
+
+  
 
     return (
         <>
@@ -151,7 +158,7 @@ export default function RegisterForm() {
                                     onChange={handleFieldChange}
                                 />
                                 <span className={styles.error}>{errors.password}</span>
-                                <PasswordStrengthBar password={password} />
+                                <PasswordStrengthBar password={user.password}  />
                             </div>
                             <div className={styles.form}>
                                 <div className={styles.passwordinput}>

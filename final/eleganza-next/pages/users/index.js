@@ -6,6 +6,10 @@ export default function UsersIndex() {
 }
 
 UsersIndex.getLayout = function (page) {
-  return <UserLayout>{page}</UserLayout>
+  return (
+    <AuthProvider>
+      <UserLayout>{page}</UserLayout>
+    </AuthProvider>
+  );
 }
 

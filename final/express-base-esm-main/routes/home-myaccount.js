@@ -4,22 +4,28 @@ import db from '##/configs/mysql.js';
 import bodyParser from 'body-parser';
 import 'dotenv/config.js';
 import jwt from "jsonwebtoken";
-// 中介軟體，存取隱私會員資料用
 import authenticate from '#middlewares/authenticate.js'
-// 檢查空物件, 轉換req.params為數字
-import { getIdParam } from '#db-helpers/db-tool.js'
-// 上傳檔案用使用multer
-import path from 'path'
+import cors from "cors";
+
+const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET
+
 import multer from 'multer'
 
-router.use(bodyParser.urlencoded({ extended: true }));
-router.use(bodyParser.json());
-
-const secretkey = "thisisverstrongaccesstokensecre"
-const token = jwt.sign({
-  userID: "BEN",
-
-}, secretkey)
+const upload = multer();
+// const whiteList = ["http://localhost:3000/", "http://127.0.0.1:3000/"];
+// const corsOptions = {
+//   credentials: true,
+//   origin(origin, callback){
+//     if(!origin || whiteList.includes(origin)){
+//       callback(null, true);
+//     }else{
+//       callback(new Error("不允許傳遞資料"))
+//     }
+//   }
+// };
+// router.use(cors(corsOptions));
+// router.use(express.urlencoded({ extended: true }));
+// router.use(express.json());
 
 router.get('/', async (req, res) => {
   try {
@@ -35,18 +41,123 @@ router.get('/', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { user_email, user_password } = req.body;
+    console.log(user_email, user_password);
     // 在資料庫中查詢使用者記錄
     const [userRows] = await db.query('SELECT * FROM `users` WHERE `user_email`=? AND `user_password`=?', [user_email, user_password]);
     const user = userRows[0];
 
-    if (user) {
-      res.status(200).json({ userId: user.user_id });
-    } else {
-      res.status(401).json({ message: '無效的認證資訊' });
+    if (!user) {
+      // 如果使用者不存在，返回錯誤訊息
+      return res.status(400).json({ status: 'error', message: '帳號或密碼錯誤' });
     }
+    
+    // 存取令牌中的資訊，只需要id和username就足夠，需要其它資料再向資料庫查詢
+    const returnUser = {
+      id: user.user_id,
+      useremail: user.user_email,
+    };
+
+    // 產生存取令牌(access token)
+    const accessToken = jwt.sign(returnUser, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: '3d',
+    });
+    console.log(accessToken);
+
+    // 在瀏覽器端使用httpOnly cookie儲存accessToken
+    res.cookie('accessToken', accessToken, { httpOnly: true });
+
+    // 回應accessToken和用戶ID到前端
+    return res.json({ status: 'success', data: { userId: user.user_id, accessToken } });
   } catch (error) {
-    console.error('登入時發生錯誤:', error);
-    res.status(500).json({ message: '伺服器錯誤' });
+    console.error("Error during login:", error);
+    res.status(500).json({ status: 'error', message: '伺服器錯誤' });
+  }
+});
+
+// 登出
+router.post('/logout', checkAccessToken, async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    // 在数据库中查询相应的用户信息
+    const [userRows] = await db.query('SELECT * FROM `users` WHERE `user_id` = ?', [userId]);
+    const user = userRows[0];
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const returnUser = {
+      id: undefined,
+      useremail: undefined,
+    };
+
+    // 產生存取令牌(access token)
+    if (user) {
+      const accessToken = jwt.sign(returnUser, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: '-10s',
+      });
+      res.status(200).json({
+        status: "success",
+        accessToken
+      });
+    } else {
+      res.status(401).json({
+        status: "error",
+        message: "登出失敗，請稍候重整頁面再嘗試"
+      });
+    }
+
+    // 清除瀏覽器對應cookie
+    res.clearCookie('accessToken', { httpOnly: true });
+    res.json({ status: 'success', data: null });
+  } catch (error) {
+    console.error('Error during logout:', error);
+    res.status(500).json({ status: 'error', message: 'Internal server error' });
+  }
+});
+
+// 檢查登入狀態，回應會員資料
+router.get('/check', checkAccessToken, async function (req, res, next) {
+  try {
+    // 如果會員是在存取令牌合法的情況下，req.user中會有會員的id和username
+    // 使用username查詢資料表，把資料表中加密過密碼字串提取出來
+    const [rows] = await db.query('SELECT * FROM users WHERE user_id = ?', [
+      req.user.id,
+    ]);
+    const user = rows[0];
+
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "找不到用戶",
+      });
+    }
+
+    // 不回傳密碼
+    delete user.user_password;
+
+    // 回傳用戶資料及新的存取令牌
+    const returnUser = {
+      id: user.user_id,
+      useremail: user.user_email,
+    };
+
+    // 產生存取令牌(access token)
+    const accessToken = jwt.sign(returnUser, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: '3d',
+    });
+
+    res.status(200).json({
+      status: "success",
+      data: { user, accessToken },
+    });
+  } catch (error) {
+    console.error("Error during checking login status:", error);
+    res.status(500).json({
+      status: "error",
+      message: "檢查狀態失敗，請重新登入",
+    });
   }
 });
 
@@ -147,6 +258,24 @@ router.put('/:userId', authenticate, async function (req, res) {
   }
 });
 
+function checkAccessToken (req, res, next) {
+  // 从请求头或 cookie 中获取访问令牌
+  const accessToken = req.headers.authorization || req.cookies.accessToken;
+
+  if (!accessToken) {
+    return res.status(401).json({ message: 'Access token is missing' });
+  }
+
+  // 验证访问令牌
+  jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ message: 'Invalid access token' });
+    }
+    // 将解码后的用户信息附加到请求对象中，以便后续处理函数使用
+    req.user = decoded;
+    next();
+  });
+};
 export default router;
 
 

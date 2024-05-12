@@ -84,14 +84,14 @@
       padding: 0 0;
     }
  }
- /* .orderdetailleft{
+  .orderdetailleft{
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start; 
     gap: 10px;
     flex: 1 0 0;
- } */
+ } 
  .orderhistorydetail{
     display: flex;
     align-items: center; 
@@ -103,6 +103,7 @@
     width: fit-content;
     @media (max-width: 1024px) {
        /* max-height: 72px; */
+       flex-direction: row;
        width: 100%;
        padding: 0 20px;
        justify-content: space-between;

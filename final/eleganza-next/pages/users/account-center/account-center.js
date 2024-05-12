@@ -4,16 +4,38 @@ import Head from 'next/head';
 import styles from './account-center.module.css';
 import UserLayout from '@/component/users/user-layout';
 import { useRouter } from 'next/router';
+import { useAuth } from '@/hooks/use-auth';
+import Link from 'next/link';
 
 export default function AccountCenter() {
   const [userDetails, setUserDetails] = useState(null);
   const router = useRouter();
   const [user, setUser] = useState({
-   useremail: '',
-   password: '',
-   phone: '',
-   confirmPassword: '',
-});
+    useremail: '',
+    password: '',
+    phone: '',
+    name: '',
+    account: '',
+    newPassword: '',
+    newPasswordConfirm: '',
+  });
+  const [errors, setErrors] = useState({
+    useremail: '',
+    password: '',
+    phone: '',
+    name: '',
+    account: '',
+    newPassword: '',
+    newPasswordConfirm: '',
+  });
+
+  const handleFieldChange = (e) => {
+    const { name, value } = e.target;
+    setUser((prevState) => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
 
   useEffect(() => {
     const { userId } = router.query; // 從 URL 參數中獲取用戶 ID
@@ -31,9 +53,10 @@ export default function AccountCenter() {
   const handleSave = (e) => {
     e.preventDefault();
     let hasErrors = false;
-    const newErrors = { username: '', password: '', phone: '', newPassword: '', newPasswordConfirm: '' };
+    const { password, newPassword, newPasswordConfirm } = user;
+    const newErrors = { password: '', newPassword: '', newPasswordConfirm: '' };
 
-    if (password == newPassword) {
+    if (password === newPassword) {
       newErrors.password = '舊密碼與新密碼不可一致';
       newErrors.newPassword = '舊密碼與新密碼不可一致';
       hasErrors = true;
@@ -45,7 +68,7 @@ export default function AccountCenter() {
       hasErrors = true;
     }
 
-    if (!user.password) {
+    if (!password) {
       newErrors.password = '*密碼為必填';
       hasErrors = true;
     }
@@ -61,20 +84,12 @@ export default function AccountCenter() {
       return;
     }
 
-    // 將更新後的用戶資料發送到後端
-    let updatedUserData = {
+    const updatedUserData = {
       user_name: userDetails.user_name,
       user_account: userDetails.user_account,
       user_phone: userDetails.user_phone,
+      user_password: newPassword ? newPassword : userDetails.user_password, // 如果有新密碼就使用新密碼，否則使用舊密碼
     };
-
-    // 檢查是否有進行密碼更改
-    if (newPassword) {
-      updatedUserData = {
-        ...updatedUserData,
-        user_password: newPassword,
-      };
-    }
 
     fetch(`http://localhost:3005/api/home-myaccount/${userId}`, {
       method: 'PUT',
@@ -86,7 +101,12 @@ export default function AccountCenter() {
       .then((response) => response.json())
       .then((data) => {
         console.log('Update success:', data);
-        // 在更新成功後，你可以做一些額外的處理，例如顯示成功提示、重新加載用戶資料等
+        setUser((prevState) => ({
+          ...prevState,
+          password: '', // 清空舊密碼欄位
+          newPassword: '', // 清空新密碼欄位
+          newPasswordConfirm: '', // 清空確認密碼欄位
+        }));
       })
       .catch((error) => console.error('Error updating user details:', error));
   };
@@ -117,9 +137,12 @@ export default function AccountCenter() {
                     <p>顯示名稱</p>
                   </div>
                   <div className={styles['formvalue']}>
-                    <input className={styles['formstyle']} type="text" defaultValue={userDetails?.user_name} />
-                    <input className={styles['formstyle']} type="text" defaultValue={userDetails?.user_phone} /> {/* 將數字轉換為字串 */}
-                    <input className={styles['formstyle']} type="text" defaultValue={userDetails?.user_account} />
+                    <input className={styles['formstyle']} type="text" placeholder={userDetails?.user_name} name="name"
+                      value={user.name} onChange={handleFieldChange} />
+                    <input className={styles['formstyle']} type="text" placeholder={userDetails?.user_phone} name="phone"
+                      value={user.phone} onChange={handleFieldChange} />
+                    <input className={styles['formstyle']} type="text" placeholder={userDetails?.user_account} name="account"
+                      value={user.account} onChange={handleFieldChange} />
                   </div>
                 </div>
               </div>
@@ -132,9 +155,12 @@ export default function AccountCenter() {
                     <p>密碼確認</p>
                   </div>
                   <div className={styles['formvalue']}>
-                    <input className={styles['formstyle']} type="password" defaultValue={userDetails?.user_password} name="password" />
-                    <input className={styles['formstyle']} type="password" defaultValue="" name="newPassword" />
-                    <input className={styles['formstyle']} type="password" defaultValue="" name="newPasswordConfirm" />
+                    <input className={styles['formstyle']} type="password" placeholder="舊密碼" name="password"
+                      value={user.password} onChange={handleFieldChange} />
+                    <input className={styles['formstyle']} type="password" placeholder="不可與舊密碼相同" name="newPassword"
+                      value={user.newPassword} onChange={handleFieldChange} />
+                    <input className={styles['formstyle']} type="password" placeholder="確認新密碼" name="newPasswordConfirm"
+                      value={user.newPasswordConfirm} onChange={handleFieldChange} />
                     <div className={styles['xsbtn']}>
                       <button type="submit">儲存</button>
                     </div>
@@ -154,7 +180,7 @@ export default function AccountCenter() {
                 borderBottom: '0.5px solid var(--color-primary-medium)',
               }}
             >
-              <p>Fanny456</p>
+              <p>{userDetails?.user_account}</p>
             </div>
             <p className={styles['maintitle']}>帳號細節</p>
             <div className={styles['formdetail']}>
@@ -175,9 +201,12 @@ export default function AccountCenter() {
                 <p>顯示名稱</p>
               </div>
               <div className={styles['formvalue']}>
-                <input className={styles['formstyle']} type="text" defaultValue={userDetails?.user_name} />
-                <input className={styles['formstyle']} type="text" defaultValue={userDetails?.user_phone} />
-                <input className={styles['formstyle']} type="text" defaultValue={userDetails?.user_account} />
+                <input className={styles['formstyle']} type="text" placeholder={userDetails?.user_name} name="name"
+                  value={user.name} onChange={handleFieldChange} />
+                <input className={styles['formstyle']} type="text" placeholder={userDetails?.user_phone} name="phone"
+                  value={user.phone} onChange={handleFieldChange} />
+                <input className={styles['formstyle']} type="text" placeholder={userDetails?.user_account} name="account"
+                  value={user.account} onChange={handleFieldChange} />
               </div>
             </div>
             <p className={styles['maintitle']}>變更密碼</p>
@@ -188,12 +217,15 @@ export default function AccountCenter() {
                 <p>密碼確認</p>
               </div>
               <div className={styles['formvalue']}>
-                <input className={styles['formstyle']} type="password" defaultValue={userDetails?.user_password} />
-                <input className={styles['formstyle']} type="password" defaultValue="" />
-                <input className={styles['formstyle']} type="password" defaultValue="" />
+                <input className={styles['formstyle']} type="password" placeholder={userDetails?.user_password} name="password"
+                  value={user.password} onChange={handleFieldChange} />
+                <input className={styles['formstyle']} type="password" placeholder="新密碼" name="newPassword"
+                  value={user.newPassword} onChange={handleFieldChange} />
+                <input className={styles['formstyle']} type="password" placeholder="確認密碼" name="newPasswordConfirm"
+                  value={user.newPasswordConfirm} onChange={handleFieldChange} />
               </div>
             </div>
-            <div className={styles['xsbtn']}>
+            <div className={styles['xsbtn']} >
               <button type="submit">儲存</button>
             </div>
           </form>

@@ -9,8 +9,6 @@ export default function MyLesson() {
       <>
   <div className={styles['mainarea-desktop-mylesson']}>
     <LessonCard/>
-    <LessonCard/>
-    <LessonCard/>
   </div>
   <div className={styles['lesson-mobile']} >
     <div className={styles['btn-mobile']} >
@@ -24,8 +22,6 @@ export default function MyLesson() {
         <a href="">課程結束</a>
       </div>
     </div>
-    <LessonCard/>
-    <LessonCard/>
     <LessonCard/>
   </div>
 </>

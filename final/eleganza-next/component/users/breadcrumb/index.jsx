@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './breadcrumb.module.scss';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 export default function Breadcrumb({ currentPage, handleIconClick }) {
   
@@ -14,10 +15,10 @@ export default function Breadcrumb({ currentPage, handleIconClick }) {
       <div className={styles['tabs-desktop']}>
         <ul className={`list-unstyled`}>
           <li>
-            <a href="http://localhost:3000/">首頁</a> /
+            <Link href="http://localhost:3000/">首頁</Link> /
           </li>
           <li>
-            <a href="/users/account-center/account-center?userId=">會員中心</a> /
+            <Link href="/users/account-center/account-center?userId=">會員中心</Link> /
           </li>
           <li className={styles['current']}>
             <a href="">{currentPage}</a>
@@ -27,9 +28,9 @@ export default function Breadcrumb({ currentPage, handleIconClick }) {
       <div className={styles['tabs-mobile']}>
         <ul className={`list-unstyled`}>
           <li>
-            <a href="#" onClick={handleIconClick}>
+            <Link href="#" onClick={handleIconClick}>
               <img src="/icons/icon-chevron-left.svg" alt="" />
-            </a>
+            </Link>
             {currentPage}
           </li>
         </ul>

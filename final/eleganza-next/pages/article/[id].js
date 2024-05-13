@@ -40,7 +40,7 @@ export async function getServerSideProps(context) {
   }
 }
 
-export default function ArticleDetailPage({ article, randomArticles }) {
+export default function ArticleDetailPage({ article, randomArticles, user }) {
   const router = useRouter()
 
   const setCurrentPage = () => {} // 假設的設定頁碼函數
@@ -49,6 +49,11 @@ export default function ArticleDetailPage({ article, randomArticles }) {
   if (!article) {
     return <p>文章未找到</p>
   }
+
+  // 將文章內容按換行符分割，然後渲染每一段
+  const formattedArticleContent = article.article_content
+    .split(',')
+    .map((paragraph, index) => <p key={index}>{paragraph}</p>)
 
   return (
     <>
@@ -78,7 +83,7 @@ export default function ArticleDetailPage({ article, randomArticles }) {
           <div className={styles['article-text']}>
             <h1>{article.article_title}</h1>
             <time>{article.article_date}</time>
-            <p>{article.article_content}</p>
+            {formattedArticleContent}
           </div>
         </div>
 
@@ -95,7 +100,12 @@ export default function ArticleDetailPage({ article, randomArticles }) {
           ))}
         </div>
         <div className={styles['article-comment']}>
-          <CommentsPage />
+          <CommentsPage
+            articleId={article}
+            userId={user}
+            // productId={product.product_id} //這邊等之後props資料過來
+            // courseId={course.course_id}
+          />
         </div>
       </div>
     </>

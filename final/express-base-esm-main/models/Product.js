@@ -2,65 +2,85 @@ import { DataTypes } from 'sequelize'
 
 export default async function (sequelize) {
   return sequelize.define(
-    'Product',
+    'Product', // 模型名稱
     {
-      id: {
+      product_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      sn: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      name: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      brand_id: {
+      product_category_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: false, // 這是一個必要的欄位
       },
-      cat_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+      product_name: {
+        type: DataTypes.STRING(50),
+        allowNull: false, // 這也是必要的
       },
-      photos: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
-      stock: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      price: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      },
-      info: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
-      color: {
-        type: DataTypes.STRING,
-        allowNull: true,
+      brand: {
+        type: DataTypes.STRING(30),
+        allowNull: false, // 不可為空
       },
       size: {
-        type: DataTypes.STRING,
-        allowNull: true,
+        type: DataTypes.INTEGER,
+        allowNull: true, // 可以為空
       },
-      tag: {
-        type: DataTypes.STRING,
-        allowNull: true,
+      top: {
+        type: DataTypes.STRING(10),
+        allowNull: true, // 可以為空
+      },
+      back_and_sides: {
+        type: DataTypes.STRING(10),
+        allowNull: true, // 可以為空
+      },
+      neck: {
+        type: DataTypes.STRING(10),
+        allowNull: true, // 可以為空
+      },
+      fingerboard: {
+        type: DataTypes.STRING(10),
+        allowNull: true, // 可以為空
+      },
+      bow: {
+        type: DataTypes.STRING(10),
+        allowNull: true, // 可以為空
+      },
+      strings: {
+        type: DataTypes.STRING(10),
+        allowNull: true, // 可以為空
+      },
+      num: {
+        type: DataTypes.INTEGER,
+        allowNull: false, // 不可為空
+      },
+      product_price: {
+        type: DataTypes.INTEGER,
+        allowNull: false, // 不可為空
+      },
+      status: {
+        type: DataTypes.INTEGER,
+        allowNull: false, // 不可為空
+      },
+      img: {
+        type: DataTypes.STRING(20),
+        allowNull: true, // 可以為空
+      },
+      introduction: {
+        type: DataTypes.STRING(150),
+        allowNull: false, // 不可為空
+      },
+      group_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true, // 可以為空
       },
     },
     {
-      tableName: 'product', //直接提供資料表名稱
-      timestamps: true, // 使用時間戳
-      paranoid: false, // 軟性刪除
-      underscored: true, // 所有自動建立欄位，使用snake_case命名
-      createdAt: 'created_at', // 建立的時間戳
-      updatedAt: 'updated_at', // 更新的時間戳
+      tableName: 'product', // 資料表名稱
+      timestamps: false, // 開啟時間戳
+      paranoid: false, // 禁用軟刪除
+      underscored: false, // 使用snake_case
+      createdAt: 'created_at', // 建立時間戳
+      updatedAt: 'updated_at', // 更新時間戳
     }
   )
 }

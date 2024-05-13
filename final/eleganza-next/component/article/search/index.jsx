@@ -44,7 +44,6 @@ export default function Search({
             alt="搜索"
             width={16}
             height={16}
-            layout="fixed"
           />
         </button>
       </div>

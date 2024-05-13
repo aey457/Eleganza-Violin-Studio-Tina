@@ -45,9 +45,9 @@ export default function ProductCard() {
             {products.map((v, i) => (  
                 <div key={v.user_id}>
                 <div className={`${styles['productcard']} ${isMobileButtonClicked ? styles['mobile-clicked'] : ''}`}>
-                    <a href="">
+                    <a href={`/products/${v.product_id}`}>
                         <img
-                            src="/images/product_images/17663193_800.jpg"
+                            src={`/images/product_images/${v.img}`}
                             alt=""
                             className={styles['productcardimg']}
                         />
@@ -55,10 +55,10 @@ export default function ProductCard() {
                     <div className={styles['product-word']}>
                         <ul className={`${styles.productcardtitle} list-unstyled`}>
                             <li className={styles['productbranding']}>
-                                <a href="">{v.brand}</a>
+                                <a href={`/products/${v.product_id}`}>{v.brand}</a>
                             </li>
                             <li>
-                                <a className={styles['productname']} href="">
+                                <a className={styles['productname']} href={`/products/${v.product_id}`}>
                                     {v.name}
                                 </a>
                             </li>

@@ -1,59 +1,54 @@
 import { DataTypes } from 'sequelize'
 
 export default async function (sequelize) {
-  const Course = sequelize.define(
-    'Course',
+  return sequelize.define(
+    'Course', // 模型名稱
     {
       course_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: true, // 自動增量
       },
       course_class_id: {
         type: DataTypes.INTEGER,
-        allowNull: true,
+        allowNull: true, // 可以為空
       },
       teacher_id: {
         type: DataTypes.INTEGER,
-        allowNull: true,
+        allowNull: true, // 可以為空
       },
       course_name: {
-        type: DataTypes.STRING,
-        allowNull: true,
+        type: DataTypes.STRING(255),
+        allowNull: true, // 可以為空
       },
       course_img: {
-        type: DataTypes.STRING,
-        allowNull: true,
+        type: DataTypes.STRING(25),
+        allowNull: true, // 可以為空
+      },
+      course_price: {
+        type: DataTypes.DECIMAL(10, 0),
+        allowNull: true, // 可以為空
       },
       course_style: {
-        type: DataTypes.STRING,
-        allowNull: true,
+        type: DataTypes.STRING(100),
+        allowNull: true, // 可以為空
       },
       course_description: {
         type: DataTypes.TEXT,
-        allowNull: true,
+        allowNull: true, // 可以為空
       },
       quota: {
         type: DataTypes.INTEGER,
-        allowNull: true,
+        allowNull: true, // 可以為空
       },
     },
     {
-      tableName: 'Course1', // 直接提供資料表名稱
+      tableName: 'course', // 資料表名稱
       timestamps: false, // 使用時間戳
-      paranoid: false, // 軟性刪除
-      underscored: true, // 所有自動建立欄位，使用snake_case命名
-      createdAt: 'created_at', // 建立的時間戳
-      updatedAt: 'updated_at', // 更新的時間戳
+      underscored: false, // 使用snake_case
+      paranoid: false, // 禁用軟刪除
+      createdAt: 'created_at', // 建立時間戳
+      updatedAt: 'updated_at', // 更新時間戳
     }
   )
-
-  Course.associate = (models) => {
-    Course.belongsTo(models.Teacher, {
-      foreignKey: 'teacher_id',
-      as: 'teacher',
-    })
-  }
-
-  return Course
 }

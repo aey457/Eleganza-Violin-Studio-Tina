@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
-import React from 'react';
-import Head from 'next/head';
-import styles from './account-center.module.css';
-import UserLayout from '@/component/users/user-layout';
-import { useRouter } from 'next/router';
-import { useAuth } from '@/hooks/use-auth';
-import Link from 'next/link';
+import { useState, useEffect } from 'react'
+import Head from 'next/head'
+import styles from './account-center.module.css'
+import UserLayout from '@/component/users/user-layout'
+import { useRouter } from 'next/router'
+import { useAuth } from '@/hooks/use-auth'
+import Link from 'next/link'
 
 export default function AccountCenter() {
-  const [userDetails, setUserDetails] = useState(null);
-  const router = useRouter();
+  const [userDetails, setUserDetails] = useState(null)
+  const router = useRouter()
+  const { auth, updateProfile } = useAuth()
+  const userId = auth?.userData?.id
+
   const [user, setUser] = useState({
     useremail: '',
     password: '',
@@ -18,7 +20,7 @@ export default function AccountCenter() {
     account: '',
     newPassword: '',
     newPasswordConfirm: '',
-  });
+  })
   const [errors, setErrors] = useState({
     useremail: '',
     password: '',
@@ -27,96 +29,81 @@ export default function AccountCenter() {
     account: '',
     newPassword: '',
     newPasswordConfirm: '',
-  });
-
-  const handleFieldChange = (e) => {
-    const { name, value } = e.target;
-    setUser((prevState) => ({
-      ...prevState,
-      [name]: value
-    }));
-  };
+  })
 
   useEffect(() => {
-    const { userId } = router.query; // 從 URL 參數中獲取用戶 ID
-    if (userId) {
-      // 向後端 API 端點發送請求獲取使用者資料
-      fetch(`http://localhost:3005/api/home-myaccount/${userId}`)
+    const storedUserId = localStorage.getItem('userId')
+    const storedAccessToken = localStorage.getItem('accessToken')
+
+    // 如果存在存储的 userId，则发送请求获取用户数据
+    if (storedUserId && storedAccessToken) {
+      fetch(`http://localhost:3005/api/home-myaccount/${storedUserId}`, {
+        headers: {
+          Authorization: `Bearer ${storedAccessToken}`,
+        },
+      })
         .then((response) => response.json())
         .then((data) => {
-          setUserDetails(data.userDetails);
+          setUserDetails(data.userDetails)
+          setUser(data.userDetails)
         })
-        .catch((error) => console.error('Error fetching user details:', error));
+        .catch((error) => console.error('Error fetching user details:', error))
     }
-  }, [router.query.userId]);
+  }, [])
 
-  const handleSave = (e) => {
-    e.preventDefault();
-    let hasErrors = false;
-    const { password, newPassword, newPasswordConfirm } = user;
-    const newErrors = { password: '', newPassword: '', newPasswordConfirm: '' };
+  const handleFieldChange = (e) => {
+    const { name, value } = e.target
+    setUser((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }))
+  }
 
-    if (password === newPassword) {
-      newErrors.password = '舊密碼與新密碼不可一致';
-      newErrors.newPassword = '舊密碼與新密碼不可一致';
-      hasErrors = true;
-    }
+  const handleSubmit = async (e) => {
+    // 阻擋表單預設送出行為
+    e.preventDefault()
 
-    if (newPassword !== newPasswordConfirm) {
-      newErrors.newPassword = '密碼與確認密碼需要一致';
-      newErrors.newPasswordConfirm = '密碼與確認密碼需要一致';
-      hasErrors = true;
-    }
+    // let hasErrors = false
+    // const { password, newPassword, newPasswordConfirm } = user
+    // const newErrors = { password: '', newPassword: '', newPasswordConfirm: '' }
 
-    if (!password) {
-      newErrors.password = '*密碼為必填';
-      hasErrors = true;
-    }
+    // if (password === newPassword) {
+    //   newErrors.password = '舊密碼與新密碼不可一致'
+    //   newErrors.newPassword = '舊密碼與新密碼不可一致'
+    //   hasErrors = true
+    // }
 
-    if (!newPasswordConfirm) {
-      newErrors.newPasswordConfirm = '*確認密碼為必填';
-      hasErrors = true;
-    }
+    // if (newPassword !== newPasswordConfirm) {
+    //   newErrors.newPassword = '密碼與確認密碼需要一致'
+    //   newErrors.newPasswordConfirm = '密碼與確認密碼需要一致'
+    //   hasErrors = true
+    // }
 
-    setErrors(newErrors);
+    // if (!password) {
+    //   newErrors.password = '*密碼為必填'
+    //   hasErrors = true
+    // }
 
-    if (hasErrors) {
-      return;
-    }
+    // if (!newPasswordConfirm) {
+    //   newErrors.newPasswordConfirm = '*確認密碼為必填'
+    //   hasErrors = true
+    // }
 
-    const updatedUserData = {
-      user_name: userDetails.user_name,
-      user_account: userDetails.user_account,
-      user_phone: userDetails.user_phone,
-      user_password: newPassword ? newPassword : userDetails.user_password, // 如果有新密碼就使用新密碼，否則使用舊密碼
-    };
+    // setErrors(newErrors)
 
-    fetch(`http://localhost:3005/api/home-myaccount/${userId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updatedUserData),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('Update success:', data);
-        setUser((prevState) => ({
-          ...prevState,
-          password: '', // 清空舊密碼欄位
-          newPassword: '', // 清空新密碼欄位
-          newPasswordConfirm: '', // 清空確認密碼欄位
-        }));
-      })
-      .catch((error) => console.error('Error updating user details:', error));
-  };
+    // if (hasErrors) {
+    //   return
+    // }
+
+    updateProfile(user)
+  }
 
   return (
     <>
       <div className={styles['main']}>
         <div className={styles['mainarea-desktop']}>
           <div>
-            <form onSubmit={handleSave}>
+            <form onSubmit={handleSubmit}>
               <p className={styles['maintitle']}>帳號細節</p>
               <div className={styles['formdetail']}>
                 <div className={styles['formkey']}>
@@ -137,12 +124,30 @@ export default function AccountCenter() {
                     <p>顯示名稱</p>
                   </div>
                   <div className={styles['formvalue']}>
-                    <input className={styles['formstyle']} type="text" placeholder={userDetails?.user_name} name="name"
-                      value={user.name} onChange={handleFieldChange} />
-                    <input className={styles['formstyle']} type="text" placeholder={userDetails?.user_phone} name="phone"
-                      value={user.phone} onChange={handleFieldChange} />
-                    <input className={styles['formstyle']} type="text" placeholder={userDetails?.user_account} name="account"
-                      value={user.account} onChange={handleFieldChange} />
+                    <input
+                      className={styles['formstyle']}
+                      type="text"
+                      placeholder={userDetails?.user_name}
+                      name="name"
+                      value={user.name}
+                      onChange={handleFieldChange}
+                    />
+                    <input
+                      className={styles['formstyle']}
+                      type="text"
+                      placeholder={userDetails?.user_phone}
+                      name="phone"
+                      value={user.phone}
+                      onChange={handleFieldChange}
+                    />
+                    <input
+                      className={styles['formstyle']}
+                      type="text"
+                      placeholder={userDetails?.user_account}
+                      name="account"
+                      value={user.account}
+                      onChange={handleFieldChange}
+                    />
                   </div>
                 </div>
               </div>
@@ -155,14 +160,37 @@ export default function AccountCenter() {
                     <p>密碼確認</p>
                   </div>
                   <div className={styles['formvalue']}>
-                    <input className={styles['formstyle']} type="password" placeholder="舊密碼" name="password"
-                      value={user.password} onChange={handleFieldChange} />
-                    <input className={styles['formstyle']} type="password" placeholder="不可與舊密碼相同" name="newPassword"
-                      value={user.newPassword} onChange={handleFieldChange} />
-                    <input className={styles['formstyle']} type="password" placeholder="確認新密碼" name="newPasswordConfirm"
-                      value={user.newPasswordConfirm} onChange={handleFieldChange} />
+                    <input
+                      className={styles['formstyle']}
+                      type="password"
+                      placeholder="舊密碼"
+                      name="password"
+                      value={user.password}
+                      onChange={handleFieldChange}
+                    />
+                    <input
+                      className={styles['formstyle']}
+                      type="password"
+                      placeholder="不可與舊密碼相同"
+                      name="newPassword"
+                      value={user.newPassword}
+                      onChange={handleFieldChange}
+                    />
+                    <input
+                      className={styles['formstyle']}
+                      type="password"
+                      placeholder="確認新密碼"
+                      name="newPasswordConfirm"
+                      value={user.newPasswordConfirm}
+                      onChange={handleFieldChange}
+                    />
                     <div className={styles['xsbtn']}>
-                      <button type="submit">儲存</button>
+                      <button
+                        type="submit"
+                        //onClick={(e) => updateProfile(e, user)}
+                      >
+                        儲存
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -172,7 +200,7 @@ export default function AccountCenter() {
         </div>
 
         <div className={styles['mainarea-mobile']}>
-          <form onSubmit={handleSave}>
+          <form onSubmit={handleSubmit}>
             <div
               style={{
                 marginBottom: 20,
@@ -201,12 +229,30 @@ export default function AccountCenter() {
                 <p>顯示名稱</p>
               </div>
               <div className={styles['formvalue']}>
-                <input className={styles['formstyle']} type="text" placeholder={userDetails?.user_name} name="name"
-                  value={user.name} onChange={handleFieldChange} />
-                <input className={styles['formstyle']} type="text" placeholder={userDetails?.user_phone} name="phone"
-                  value={user.phone} onChange={handleFieldChange} />
-                <input className={styles['formstyle']} type="text" placeholder={userDetails?.user_account} name="account"
-                  value={user.account} onChange={handleFieldChange} />
+                <input
+                  className={styles['formstyle']}
+                  type="text"
+                  placeholder={userDetails?.user_name}
+                  name="name"
+                  value={user.name}
+                  onChange={handleFieldChange}
+                />
+                <input
+                  className={styles['formstyle']}
+                  type="text"
+                  placeholder={userDetails?.user_phone}
+                  name="phone"
+                  value={user.phone}
+                  onChange={handleFieldChange}
+                />
+                <input
+                  className={styles['formstyle']}
+                  type="text"
+                  placeholder={userDetails?.user_account}
+                  name="account"
+                  value={user.account}
+                  onChange={handleFieldChange}
+                />
               </div>
             </div>
             <p className={styles['maintitle']}>變更密碼</p>
@@ -217,24 +263,47 @@ export default function AccountCenter() {
                 <p>密碼確認</p>
               </div>
               <div className={styles['formvalue']}>
-                <input className={styles['formstyle']} type="password" placeholder={userDetails?.user_password} name="password"
-                  value={user.password} onChange={handleFieldChange} />
-                <input className={styles['formstyle']} type="password" placeholder="新密碼" name="newPassword"
-                  value={user.newPassword} onChange={handleFieldChange} />
-                <input className={styles['formstyle']} type="password" placeholder="確認密碼" name="newPasswordConfirm"
-                  value={user.newPasswordConfirm} onChange={handleFieldChange} />
+                <input
+                  className={styles['formstyle']}
+                  type="password"
+                  placeholder={userDetails?.user_password}
+                  name="password"
+                  value={user.password}
+                  onChange={handleFieldChange}
+                />
+                <input
+                  className={styles['formstyle']}
+                  type="password"
+                  placeholder="新密碼"
+                  name="newPassword"
+                  value={user.newPassword}
+                  onChange={handleFieldChange}
+                />
+                <input
+                  className={styles['formstyle']}
+                  type="password"
+                  placeholder="確認密碼"
+                  name="newPasswordConfirm"
+                  value={user.newPasswordConfirm}
+                  onChange={handleFieldChange}
+                />
               </div>
             </div>
-            <div className={styles['xsbtn']} >
-              <button type="submit">儲存</button>
+            <div className={styles['xsbtn']}>
+              <button
+                type="submit"
+                //onClick={(e) => updateProfile(e, user)}
+              >
+                儲存
+              </button>
             </div>
           </form>
         </div>
       </div>
     </>
-  );
+  )
 }
 
 AccountCenter.getLayout = function (page) {
-  return <UserLayout currentPage="我的帳號">{page}</UserLayout>;
-};
+  return <UserLayout currentPage="我的帳號">{page}</UserLayout>
+}

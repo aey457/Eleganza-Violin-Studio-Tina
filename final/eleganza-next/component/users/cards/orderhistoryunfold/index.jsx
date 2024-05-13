@@ -108,16 +108,16 @@ export default function OrderHistoryUnfoldCard() {
                                     <div key={productIndex}>           
                                         <div className={styles.orderhistorydetail}>
                                             <div className={styles.orderimg}>
-                                                <a href="">
-                                                    <img src="/images/product_images/17663193_800.jpg" alt="" />
+                                                <a href={`/products/${product.product_id}`}>
+                                                <img src={`/images/product_images/${product.img}`} alt={product.alt} />
                                                 </a>
                                             </div>
                                             <div className={styles.orderwords}>
                                                 <div className={styles.ordertitle}>
-                                                    <a href="" className={styles.orderbrand}>
+                                                    <a href={`/products/${product.product_id}`} className={styles.orderbrand}>
                                                         {product.brand}
                                                     </a>
-                                                    <a href="">{product.name}</a>
+                                                    <a href={`/products/${product.product_id}`}>{product.name}</a>
                                                 </div>
                                                 <div className={styles.orderprice}>
                                                     <p>{product.product_price}</p>

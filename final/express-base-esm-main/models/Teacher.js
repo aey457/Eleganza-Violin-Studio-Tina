@@ -1,56 +1,54 @@
 import { DataTypes } from 'sequelize'
 
 export default async function (sequelize) {
-  const Teacher = sequelize.define(
-    'Teacher',
+  return sequelize.define(
+    'Teacher', // 模型名稱
     {
       teacher_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: true, // 自動增量
       },
       t_name: {
-        type: DataTypes.STRING,
-        allowNull: true,
+        type: DataTypes.STRING(255),
+        allowNull: false, // 不可為空
       },
       onsite_teacher: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
+        type: DataTypes.TINYINT(1),
+        allowNull: true, // 可以為空
       },
       t_img: {
-        type: DataTypes.STRING,
-        allowNull: true,
+        type: DataTypes.STRING(255),
+        allowNull: true, // 可以為空
       },
       t_years: {
         type: DataTypes.INTEGER,
-        allowNull: true,
+        allowNull: true, // 可以為空
       },
       education: {
         type: DataTypes.TEXT,
-        allowNull: true,
+        allowNull: true, // 可以為空
       },
       courses: {
         type: DataTypes.TEXT,
-        allowNull: true,
+        allowNull: true, // 可以為空
       },
       introduction: {
         type: DataTypes.TEXT,
-        allowNull: true,
+        allowNull: true, // 可以為空
       },
       experience: {
         type: DataTypes.TEXT,
-        allowNull: true,
+        allowNull: true, // 可以為空
       },
     },
     {
-      tableName: 'Teacher1', // 直接提供資料表名稱
+      tableName: 'teacher', // 資料表名稱
       timestamps: false, // 使用時間戳
-      paranoid: false, // 軟性刪除
-      underscored: true, // 所有自動建立欄位，使用 snake_case 命名
+      paranoid: false, // 無軟刪除
+      underscored: false, // 使用snake_case
       createdAt: 'created_at', // 建立的時間戳
       updatedAt: 'updated_at', // 更新的時間戳
     }
   )
-
-  return Teacher
 }

@@ -6,89 +6,66 @@ export default async function (sequelize) {
   return sequelize.define(
     'User',
     {
-      id: {
+      user_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      name: {
-        type: DataTypes.STRING,
+      user_name: {
+        type: DataTypes.STRING(10), // 字符串最大长度10
         allowNull: false,
       },
-      username: {
-        type: DataTypes.STRING,
+      user_account: {
+        type: DataTypes.STRING(20), // 字符串最大长度20
+        allowNull: false,
+      },
+      user_password: {
+        type: DataTypes.STRING(20), // 字符串最大长度20
+        allowNull: false,
+      },
+      user_phone: {
+        type: DataTypes.STRING(10), // 字符串最大长度10
+        allowNull: false,
+      },
+      user_email: {
+        type: DataTypes.STRING(30), // 字符串最大长度30
+        allowNull: false,
+      },
+      user_level: {
+        type: DataTypes.STRING(10), // 字符串最大长度10
+        allowNull: false,
+      },
+      user_track: {
+        type: DataTypes.STRING(30), // 字符串最大长度30
         allowNull: true,
       },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: true,
+      user_birth: {
+        type: DataTypes.DATEONLY, // 仅需要日期
+        allowNull: false,
       },
-      email: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      avatar: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      birth_date: {
-        type: DataTypes.DATEONLY, //只需要日期
-        allowNull: true,
-      },
-      sex: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      phone: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      postcode: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      address: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      google_uid: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      line_uid: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      photo_url: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      line_access_token: {
-        type: DataTypes.TEXT,
-        allowNull: true,
+      user_blacklist: {
+        type: DataTypes.INTEGER(1), // 0 或 1
+        allowNull: false,
       },
     },
     {
       hooks: {
-        // 建立時產生密碼加密字串用
+        // 在创建或更新用户时加密密码
         beforeCreate: async (user) => {
-          if (user.password) {
-            user.password = await generateHash(user.password)
+          if (user.user_password) {
+            user.user_password = await generateHash(user.user_password)
           }
         },
-        // 更新時產生密碼加密字串用
         beforeUpdate: async (user) => {
-          if (user.password) {
-            user.password = await generateHash(user.password)
+          if (user.user_password) {
+            user.user_password = await generateHash(user.user_password)
           }
         },
       },
-      tableName: 'user', //直接提供資料表名稱
-      timestamps: true, // 使用時間戳
-      paranoid: false, // 軟性刪除
-      underscored: true, // 所有自動建立欄位，使用snake_case命名
-      createdAt: 'created_at', // 建立的時間戳
-      updatedAt: 'updated_at', // 更新的時間戳
+      tableName: 'users', // 指定数据表名称
+      timestamps: false, // 开启时间戳
+      createdAt: 'created_at', // 创建时间戳字段
+      updatedAt: 'updated_at', // 更新时间戳字段
     }
   )
 }

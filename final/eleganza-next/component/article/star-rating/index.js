@@ -39,8 +39,10 @@ export default function StarRating({
             return (
               <button
                 key={i}
+                type="button"
                 className={styles['star-btn']}
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation() // 阻止事件冒泡
                   //點按後設定分數
                   setRating(score)
                   // 利用onRatingChange的函式，可以回送分數到父母元件

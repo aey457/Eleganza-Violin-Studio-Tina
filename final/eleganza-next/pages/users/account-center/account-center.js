@@ -63,37 +63,37 @@ export default function AccountCenter() {
     // 阻擋表單預設送出行為
     e.preventDefault()
 
-    // let hasErrors = false
-    // const { password, newPassword, newPasswordConfirm } = user
-    // const newErrors = { password: '', newPassword: '', newPasswordConfirm: '' }
+    let hasErrors = false
+    const { password, newPassword, newPasswordConfirm } = user
+    const newErrors = { password: '', newPassword: '', newPasswordConfirm: '' }
 
-    // if (password === newPassword) {
-    //   newErrors.password = '舊密碼與新密碼不可一致'
-    //   newErrors.newPassword = '舊密碼與新密碼不可一致'
-    //   hasErrors = true
-    // }
+    if (password === newPassword) {
+      newErrors.password = '舊密碼與新密碼不可一致'
+      newErrors.newPassword = '舊密碼與新密碼不可一致'
+      hasErrors = true
+    }
 
-    // if (newPassword !== newPasswordConfirm) {
-    //   newErrors.newPassword = '密碼與確認密碼需要一致'
-    //   newErrors.newPasswordConfirm = '密碼與確認密碼需要一致'
-    //   hasErrors = true
-    // }
+    if (newPassword !== newPasswordConfirm) {
+      newErrors.newPassword = '密碼與確認密碼需要一致'
+      newErrors.newPasswordConfirm = '密碼與確認密碼需要一致'
+      hasErrors = true
+    }
 
-    // if (!password) {
-    //   newErrors.password = '*密碼為必填'
-    //   hasErrors = true
-    // }
+    if (!password) {
+      newErrors.password = '*密碼為必填'
+      hasErrors = true
+    }
 
-    // if (!newPasswordConfirm) {
-    //   newErrors.newPasswordConfirm = '*確認密碼為必填'
-    //   hasErrors = true
-    // }
+    if (!newPasswordConfirm) {
+      newErrors.newPasswordConfirm = '*確認密碼為必填'
+      hasErrors = true
+    }
 
-    // setErrors(newErrors)
+    setErrors(newErrors)
 
-    // if (hasErrors) {
-    //   return
-    // }
+    if (hasErrors) {
+      return
+    }
 
     updateProfile(user)
   }

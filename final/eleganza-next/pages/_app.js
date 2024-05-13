@@ -1,4 +1,5 @@
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import React from 'react'
 import '@/styles/globals.scss'
 import DefaultLayout from '@/component/default-layout'
 import { AuthProvider } from '@/hooks/use-auth'

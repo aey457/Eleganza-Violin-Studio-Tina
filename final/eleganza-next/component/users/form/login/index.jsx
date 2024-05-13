@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import React from 'react'
 import styles from './login.module.scss'
 import { useRouter } from 'next/router'
@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/use-auth'
 import Link from 'next/link'
 
 export default function LoginForm() {
+  const { auth } = useAuth()
   const { login } = useAuth()
 
   const [user, setUser] = useState({
@@ -66,9 +67,9 @@ export default function LoginForm() {
     <>
       <div className={styles.overlaybg}>
         <div className={styles.popupwindow}>
-          <a href="">
+          <Link href="">
             <img src="/icons/icon-x.svg" alt="" />
-          </a>
+          </Link>
           <div className={styles.formwrap}>
             <div className={styles.logo}>
               <a href="">ELEGANZA</a>
@@ -114,9 +115,9 @@ export default function LoginForm() {
               </div>
             </form>
             <div className={styles.registeraccount}>
-              <a href="http://localhost:3000/users/user-form/register">
+              <Link href="http://localhost:3000/users/user-form/register">
                 註冊帳號
-              </a>
+              </Link>
             </div>
           </div>
         </div>

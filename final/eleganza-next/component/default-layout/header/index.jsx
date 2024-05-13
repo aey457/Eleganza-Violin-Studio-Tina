@@ -1,18 +1,13 @@
+import { useState, useEffect } from 'react'
 import React from 'react'
 import styles from './header.module.scss'
 import Link from 'next/link'
-import { useRouter } from 'next/router';
-// import { useAuth } from '@/hooks/use-auth';
-
-// const { auth } = useAuth();
+import { useRouter } from 'next/router'
+import { useAuth } from '@/hooks/use-auth'
 
 export default function Header() {
-  const router = useRouter();
-  // 登入狀態，true表示已登录，false表示未登录
-  const isLoggedIn = true;
-
-  // 
-  const loginLink = isLoggedIn ? '/users/account-center/account-center' : '/users/user-form/login';
+  const { auth } = useAuth()
+  const router = useRouter()
 
   return (
     <>
@@ -49,14 +44,19 @@ export default function Header() {
             <a href="">
               <img className={styles.cart} src="/icons/icon-cart-white.svg" />
             </a>
-            
-            <a href={loginLink}>
-              {/* 如果偵測到登入狀態就是account-center */}
+
+            <Link
+              href={
+                auth.isLoggedIn
+                  ? '/users/account-center/account-center'
+                  : '/users/user-form/login'
+              }
+            >
               <img
                 className={styles.account}
                 src="/icons/icon-user-white.svg"
               />
-            </a>
+            </Link>
             <a href="">
               <img className={styles.menu} src="/icons/icon-menu-white.svg" />
             </a>

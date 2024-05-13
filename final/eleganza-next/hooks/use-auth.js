@@ -125,7 +125,7 @@ export function AuthProvider({ children }) {
   }
 
   const updateProfile = (user) => {
-    console.log(user)
+    console.log(user.JSON)
     const storedUserDetails = JSON.parse(localStorage.getItem('userData'))
 
     const updatedUserData = {

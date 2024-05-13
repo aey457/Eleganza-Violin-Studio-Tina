@@ -11,46 +11,34 @@ export default function SideNav() {
   const [isSideNavVisible, setIsSideNavVisible] = useState(false)
   const [user, setUser] = useState({})
   const router = useRouter()
+  const { auth } = useAuth()
 
-  const parseJwt = (token) => {
-    const base64Payload = token.split('.')[1]
-    const payload = Buffer.from(base64Payload, 'base64')
-    return JSON.parse(payload.toString())
-  }
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const accessToken = localStorage.getItem('accessToken')
+        if (!accessToken) {
+          // 如果 localStorage 中沒有 accessToken，則不執行後續操作
+          return
+        }
+        const parseJwt = (token) => {
+          const base64Payload = token.split('.')[1]
+          const payload = Buffer.from(base64Payload, 'base64')
+          return JSON.parse(payload.toString())
+        }
 
-  // useEffect(() => {
-  //   const { userId } = router.query;
-  //   if (userId) {
-  //     fetch(`http://localhost:3005/api/home-myaccount/${userId}`)
-  //       .then(response => response.json())
-  //       .then(data => {
-  //         setUser(data.userDetails);
-  //       })
-  //       .catch(error => console.error('Error fetching user details:', error));
-  //   }
-  // }, [router.query.userId]);
+        // 解析 JWT 並提取 userData
+        const userData = parseJwt(accessToken)
 
-  // const handleLogout = async (e) => {
-  //   e.preventDefault()
+        setUser(userData) // 更新使用者資料狀態
+        console.log(userData)
+      } catch (error) {
+        console.error('Error fetching user details:', error)
+      }
+    }
 
-  //   const res = await fetch('http://localhost:3005/home-myaccount/logout', {
-  //     credentials: 'include',
-  //     method: 'POST',
-  //     headers: {
-  //       Accept: 'application/json',
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify({}),
-  //   })
-
-  //   const data = await res.json()
-
-  //   if (data.status === 'success') {
-  //     alert('登出成功')
-  //   } else {
-  //     alert(data.message)
-  //   }
-  // }
+    fetchUserData() // 執行取得使用者資料的函式
+  }, [])
 
   const toggleSideNav = () => {
     setIsSideNavVisible(!isSideNavVisible)
@@ -237,9 +225,9 @@ export default function SideNav() {
             </Link>
           </li>
           <li>
-            <a className={styles['sidenavlogout']} onClick={logout} href="">
+            <Link className={styles['sidenavlogout']} onClick={logout} href="">
               登出
-            </a>
+            </Link>
           </li>
         </ul>
       </div>

@@ -60,11 +60,11 @@ router.post('/login', async (req, res) => {
     // 存取令牌中的資訊，只需要id和username就足夠，需要其它資料再向資料庫查詢
     const returnUser = {
       id: user.user_id,
-      useremail: user.user_email,
-      username: user.user_name,
-      useraccount: user.user_account,
-      userphone: user.user_phone,
-      userpassword: user.user_password,
+      user_email: user.user_email,
+      user_name: user.user_name,
+      user_account: user.user_account,
+      user_phone: user.user_phone,
+      user_password: user.user_password,
     }
 
     // 產生存取令牌(access token)
@@ -139,8 +139,8 @@ router.get('/check', checkAccessToken, async function (req, res, next) {
 
     // 回傳用戶資料及新的存取令牌
     const returnUser = {
-      id: user.user_id,
-      useremail: user.user_email,
+      user_id: user.user_id,
+      user_email: user.user_email,
     }
 
     // 產生存取令牌(access token)

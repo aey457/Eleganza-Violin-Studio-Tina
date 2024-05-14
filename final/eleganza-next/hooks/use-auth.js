@@ -79,9 +79,7 @@ export function AuthProvider({ children }) {
         console.log(parseJwt(data.data.accessToken))
 
         // 登录成功，将用户导向 account-center 页面
-        router.push(
-          `/users/account-center/account-center?userId=${data.data.userId}`,
-        )
+        router.back
         alert('登入成功')
       } else {
         // 处理登录失败的情况

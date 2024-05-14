@@ -65,61 +65,54 @@ export default function LoginForm() {
 
   return (
     <>
-      <div className={styles.overlaybg}>
-        <div className={styles.popupwindow}>
-          <Link href="">
-            <img src="/icons/icon-x.svg" alt="" />
-          </Link>
-          <div className={styles.formwrap}>
-            <div className={styles.logo}>
-              <a href="">ELEGANZA</a>
-            </div>
-            <form className={styles.formwraps} onSubmit={handleSubmit}>
-              <div className={styles.form}>
-                <label className={styles.formkey}>Email</label>
-                <input
-                  className={styles.formvalue}
-                  type="text"
-                  name="useremail"
-                  onChange={handleFieldChange}
-                />
-                <span className={styles.error}>{errors.useremail}</span>
-              </div>
-              <div className={styles.form}>
-                <div className={styles.passwordinput}>
-                  <label className={styles.formkey}>密碼</label>
-                  <a href="#" onClick={togglePasswordVisibility}>
-                    <img
-                      src="/icons/icon-eye.svg"
-                      alt="Toggle Password Visibility"
-                    />
-                  </a>
-                </div>
-                <input
-                  className={styles.formvalue}
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  onChange={handleFieldChange}
-                />
-                <span className={styles.error}>{errors.password}</span>
-              </div>
-              <div className={styles.formcheck}>
-                <div className={styles.checkloginstatus}>
-                  <input type="checkbox" />
-                  <p>保持登入狀態</p>
-                </div>
-                <a href="">忘記密碼？</a>
-              </div>
-              <div className={styles.mbtn} onClick={handleSubmit}>
-                <button type="submit">登入</button>
-              </div>
-            </form>
-            <div className={styles.registeraccount}>
-              <Link href="http://localhost:3000/users/user-form/register">
-                註冊帳號
-              </Link>
-            </div>
+      <div className={styles.formwrap}>
+        <div className={styles.logo}>
+          <a href="">ELEGANZA</a>
+        </div>
+        <form className={styles.formwraps} onSubmit={handleSubmit}>
+          <div className={styles.form}>
+            <label className={styles.formkey}>Email</label>
+            <input
+              className={styles.formvalue}
+              type="text"
+              name="useremail"
+              onChange={handleFieldChange}
+            />
+            <span className={styles.error}>{errors.useremail}</span>
           </div>
+          <div className={styles.form}>
+            <div className={styles.passwordinput}>
+              <label className={styles.formkey}>密碼</label>
+              <a href="#" onClick={togglePasswordVisibility}>
+                <img
+                  src="/icons/icon-eye.svg"
+                  alt="Toggle Password Visibility"
+                />
+              </a>
+            </div>
+            <input
+              className={styles.formvalue}
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              onChange={handleFieldChange}
+            />
+            <span className={styles.error}>{errors.password}</span>
+          </div>
+          <div className={styles.formcheck}>
+            <div className={styles.checkloginstatus}>
+              <input type="checkbox" />
+              <p>保持登入狀態</p>
+            </div>
+            <a href="">忘記密碼？</a>
+          </div>
+          <div className={styles.mbtn} onClick={handleSubmit}>
+            <button type="submit">登入</button>
+          </div>
+        </form>
+        <div className={styles.registeraccount}>
+          <Link href="http://localhost:3000/users/user-form/register">
+            註冊帳號
+          </Link>
         </div>
       </div>
     </>

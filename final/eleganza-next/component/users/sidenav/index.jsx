@@ -12,6 +12,8 @@ export default function SideNav() {
   const [user, setUser] = useState({})
   const router = useRouter()
   const { auth } = useAuth()
+  const [hasLesson, setHasLesson] = useState(false)
+  const [hasLessonCollection, setHasLessonCollection] = useState(false)
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -29,9 +31,26 @@ export default function SideNav() {
 
         // 解析 JWT 並提取 userData
         const userData = parseJwt(accessToken)
-
         setUser(userData) // 更新使用者資料狀態
         console.log(userData)
+
+        // 檢查是否有課程
+        const res = await fetch(
+          `http://localhost:3005/api/my-lessoncollection/lessonorder/${userData.id}`,
+        )
+        const data = await res.json()
+        console.log(data)
+        setHasLesson(Array.isArray(data) && data.length > 0)
+
+        // 檢查是否有課程收藏
+        const lessonCollectionRes = await fetch(
+          `http://localhost:3005/api/my-lessoncollection/lessoncollection/${userData.id}`,
+        )
+        const lessonCollectionData = await lessonCollectionRes.json()
+        setHasLessonCollection(
+          Array.isArray(lessonCollectionData) &&
+            lessonCollectionData.length > 0,
+        )
       } catch (error) {
         console.error('Error fetching user details:', error)
       }
@@ -39,7 +58,7 @@ export default function SideNav() {
 
     fetchUserData() // 執行取得使用者資料的函式
   }, [])
-
+  console.log(hasLesson)
   const toggleSideNav = () => {
     setIsSideNavVisible(!isSideNavVisible)
   }
@@ -69,7 +88,11 @@ export default function SideNav() {
           </li>
           <li>
             <Link
-              href="/users/mobile-cardlayout/my-lesson"
+              href={
+                hasLesson
+                  ? '/users/empty/orderhistory-empty-l'
+                  : '/users/mobile-cardlayout/my-lesson'
+              }
               onClick={() => setCurrentPage('我的課程')}
               className={
                 currentPage === '我的課程' ? styles['sidenavselected'] : ''
@@ -107,7 +130,11 @@ export default function SideNav() {
                 }
               >
                 <Link
-                  href="/users/mobile-cardlayout/lesson-collection"
+                  href={
+                    hasLessonCollection
+                      ? '/users/empty/collection-empty-l'
+                      : '/users/mobile-cardlayout/lesson-collection'
+                  }
                   onClick={() => setCurrentSubPage('課程收藏')}
                 >
                   課程收藏
@@ -164,7 +191,11 @@ export default function SideNav() {
           </li>
           <li>
             <Link
-              href="/users/mobile-cardlayout/my-lesson"
+              href={
+                hasLesson
+                  ? '/users/mobile-cardlayout/my-lesson'
+                  : '/users/empty/orderhistory-empty-l'
+              }
               onClick={() => setCurrentPage('我的課程')}
               className={
                 currentPage === '我的課程' ? styles['sidenavselected'] : ''

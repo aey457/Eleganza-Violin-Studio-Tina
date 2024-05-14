@@ -5,7 +5,7 @@ import UserLayout from '@/component/users/user-layout'
 import { useAuth } from '@/hooks/use-auth'
 import Link from 'next/link'
 
-export default function CollectionEmpty() {
+export default function CollectionEmptyP() {
   const { auth } = useAuth()
 
   return (
@@ -15,21 +15,21 @@ export default function CollectionEmpty() {
           <p>您尚未有任何一筆訂單</p>
         </div>
         <div className={styles['sbtn']}>
-          <Link href="">前往購物</Link>
+          <Link href="/products">前往購物</Link>
         </div>
       </div>
       <div className={styles['lesson-mobile']}>
         <div className={styles['emptycontent']}>
-          <p>您尚未有任何一筆訂單</p>
+          <p>您尚未有任何一筆商品訂單</p>
         </div>
         <div className={styles['sbtn']}>
-          <Link href="">前往購物</Link>
+          <Link href="/products">前往購物</Link>
         </div>
       </div>
     </>
   )
 }
 
-CollectionEmpty.getLayout = function (page) {
+CollectionEmptyP.getLayout = function (page) {
   return <UserLayout currentPage="歷史訂單">{page}</UserLayout>
 }

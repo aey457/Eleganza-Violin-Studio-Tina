@@ -4,10 +4,12 @@ import styles from './header.module.scss'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useAuth } from '@/hooks/use-auth'
+import LoginForm from '@/component/users/form/login'
 
 export default function Header() {
   const { auth } = useAuth()
   const router = useRouter()
+  const [showOffcanvas, setShowOffcanvas] = useState(false)
 
   return (
     <>
@@ -51,12 +53,41 @@ export default function Header() {
                   ? '/users/account-center/account-center'
                   : '/users/user-form/login'
               }
+            ></Link>
+            <button
+              type="button"
+              onClick={() => {
+                if (!auth.isLoggedIn) {
+                  setShowOffcanvas(!showOffcanvas)
+                } else {
+                  router.push('/users/account-center/account-center')
+                }
+              }}
             >
               <img
                 className={styles.account}
                 src="/icons/icon-user-white.svg"
               />
-            </Link>
+            </button>
+            <div
+              className={`offcanvas offcanvas-end ${showOffcanvas ? 'show' : ''}`}
+              tabIndex="-1"
+              id="offcanvasRight"
+              aria-labelledby="offcanvasRightLabel"
+            >
+              <div className="offcanvas-header">
+                <button
+                  type="button"
+                  className="btn-close text-reset"
+                  data-bs-dismiss="offcanvas"
+                  aria-label="Close"
+                  onClick={() => setShowOffcanvas(false)}
+                ></button>
+              </div>
+              <div className="offcanvas-body">
+                <LoginForm />
+              </div>
+            </div>
             <a href="">
               <img className={styles.menu} src="/icons/icon-menu-white.svg" />
             </a>

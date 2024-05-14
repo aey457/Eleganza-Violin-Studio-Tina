@@ -4,6 +4,7 @@ import styles from './login.module.scss'
 import { useRouter } from 'next/router'
 import { useAuth } from '@/hooks/use-auth'
 import Link from 'next/link'
+import RegisterForm from '@/component/users/form/register'
 
 export default function LoginForm() {
   const { auth } = useAuth()
@@ -63,6 +64,12 @@ export default function LoginForm() {
     }
   }
 
+  const [showOffcanvas, setShowOffcanvas] = useState(false)
+
+  const handleToggleOffcanvas = () => {
+    setShowOffcanvas(!showOffcanvas)
+  }
+
   return (
     <>
       <div className={styles.formwrap}>
@@ -110,9 +117,29 @@ export default function LoginForm() {
           </div>
         </form>
         <div className={styles.registeraccount}>
-          <Link href="http://localhost:3000/users/user-form/register">
+          <button type="button" onClick={handleToggleOffcanvas}>
             註冊帳號
-          </Link>
+          </button>
+        </div>
+        <div
+          className={`offcanvas offcanvas-end ${showOffcanvas ? 'show' : ''}`}
+          tabIndex="-1"
+          id="offcanvasRight"
+          aria-labelledby="offcanvasRightLabel"
+        >
+          <div className="offcanvas-header">
+            <button
+              type="button"
+              className="btn-close text-reset"
+              data-bs-dismiss="offcanvas"
+              aria-label="Close"
+              onClick={() => setShowOffcanvas(false)}
+            ></button>
+          </div>
+          <div className="offcanvas-body">
+            {/* 這裡放入註冊表單元件 */}
+            <RegisterForm />
+          </div>
         </div>
       </div>
     </>

@@ -1,17 +1,12 @@
-import { useState, useEffect } from 'react'
-import React from 'react'
+import { useState } from 'react'
 import styles from './register.module.scss'
 import PasswordStrengthBar from 'react-password-strength-bar'
 import { useRouter } from 'next/router'
-import { useAuth } from '@/hooks/use-auth'
-import Link from 'next/link'
+import LoginForm from '@/component/users/form/login'
 
 export default function RegisterForm() {
-  const { auth } = useAuth()
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+  const router = useRouter()
+
   const [user, setUser] = useState({
     useremail: '',
     password: '',
@@ -24,6 +19,7 @@ export default function RegisterForm() {
     phone: '',
     confirmPassword: '',
   })
+  const [showLoginForm, setShowLoginForm] = useState(false)
 
   const handleFieldChange = (e) => {
     const { name, value } = e.target
@@ -32,8 +28,6 @@ export default function RegisterForm() {
       [name]: value,
     }))
   }
-
-  const router = useRouter()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -101,8 +95,7 @@ export default function RegisterForm() {
       console.log(data)
 
       if (res.ok) {
-        // 注册成功后重定向到登录页面
-        router.push('/users/user-form/login')
+        setShowLoginForm(true)
         alert('註冊成功，請以新帳號密碼重新登入使用。')
       } else {
         alert('帳號註冊失敗，請再試一次。')
@@ -125,96 +118,116 @@ export default function RegisterForm() {
     setShowPassword2((prevState) => !prevState)
   }
 
+  const handleLoginButtonClick = () => {
+    // 切換為顯示登入表單的模式
+    setShowLoginForm(true)
+  }
+
   return (
     <>
-      <div className={styles.overlaybg}>
-        <div className={styles.popupwindow}>
-          <Link href="">
-            <img src="/icons/icon-x.svg" alt="" />
-          </Link>
-          <div className={styles.formwrap}>
-            <div className={styles.logo}>
-              <a href="">ELEGANZA</a>
+      <div className={styles.formwrap}>
+        <div className={styles.logo}>
+          <a href="">ELEGANZA</a>
+        </div>
+        <form className={styles.formwraps} onSubmit={handleSubmit}>
+          <div className={styles.form}>
+            <p className={styles.formkey}>Email</p>
+            <input
+              className={styles.formvalue}
+              type="text"
+              name="useremail"
+              value={user.useremail}
+              onChange={handleFieldChange}
+            />
+            <span className={styles.error}>{errors.useremail}</span>
+          </div>
+          <div className={styles.form}>
+            <p className={styles.formkey}>手機號碼</p>
+            <input
+              className={styles.formvalue}
+              type="text"
+              name="phone"
+              value={user.phone}
+              onChange={handleFieldChange}
+            />
+          </div>
+          <div className={styles.form}>
+            <div className={styles.passwordinput}>
+              <label className={styles.formkey}>密碼</label>
+              <a href="#" onClick={togglePasswordVisibility}>
+                <img
+                  src="/icons/icon-eye.svg"
+                  alt="Toggle Password Visibility"
+                />
+              </a>
             </div>
-            <form className={styles.formwraps} onSubmit={handleSubmit}>
-              <div className={styles.form}>
-                <p className={styles.formkey}>Email</p>
-                <input
-                  className={styles.formvalue}
-                  type="text"
-                  name="useremail"
-                  value={user.useremail}
-                  onChange={handleFieldChange}
+            <input
+              className={styles.formvalue}
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              value={user.password}
+              onChange={handleFieldChange}
+            />
+            <span className={styles.error}>{errors.password}</span>
+            <PasswordStrengthBar password={user.password} />
+          </div>
+          <div className={styles.form}>
+            <div className={styles.passwordinput}>
+              <label className={styles.formkey}>重新輸入密碼</label>
+              <a href="#" onClick={togglePasswordVisibility2}>
+                <img
+                  src="/icons/icon-eye.svg"
+                  alt="Toggle Password Visibility"
                 />
-                <span className={styles.error}>{errors.useremail}</span>
-              </div>
-              <div className={styles.form}>
-                <p className={styles.formkey}>手機號碼</p>
-                <input
-                  className={styles.formvalue}
-                  type="text"
-                  name="phone"
-                  value={user.phone}
-                  onChange={handleFieldChange}
-                />
-              </div>
-              <div className={styles.form}>
-                <div className={styles.passwordinput}>
-                  <label className={styles.formkey}>密碼</label>
-                  <a href="#" onClick={togglePasswordVisibility}>
-                    <img
-                      src="/icons/icon-eye.svg"
-                      alt="Toggle Password Visibility"
-                    />
-                  </a>
-                </div>
-                <input
-                  className={styles.formvalue}
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={user.password}
-                  onChange={handleFieldChange}
-                />
-                <span className={styles.error}>{errors.password}</span>
-                <PasswordStrengthBar password={user.password} />
-              </div>
-              <div className={styles.form}>
-                <div className={styles.passwordinput}>
-                  <label className={styles.formkey}>重新輸入密碼</label>
-                  <a href="#" onClick={togglePasswordVisibility2}>
-                    <img
-                      src="/icons/icon-eye.svg"
-                      alt="Toggle Password Visibility"
-                    />
-                  </a>
-                </div>
-                <input
-                  className={styles.formvalue}
-                  type={showPassword2 ? 'text' : 'password'}
-                  name="confirmPassword"
-                  value={user.confirmPassword}
-                  onChange={handleFieldChange}
-                />
-                <span className={styles.error}>{errors.confirmPassword}</span>
-              </div>
-              <div className={styles.formcheck}>
-                <div className={styles.checkloginstatus}>
-                  <input type="checkbox" />
-                  <p>保持登入狀態</p>
-                </div>
-                <a href="">忘記密碼？</a>
-              </div>
-              <div className={styles.mbtn} onClick={handleSubmit}>
-                <button type="submit">註冊</button>
-              </div>
-            </form>
-            <div className={styles.registeraccount}>
-              <p>已有帳號了嗎？</p>
-              <Link href="http://localhost:3000/users/user-form/login">
-                由此登入
-              </Link>
+              </a>
+            </div>
+            <input
+              className={styles.formvalue}
+              type={showPassword2 ? 'text' : 'password'}
+              name="confirmPassword"
+              value={user.confirmPassword}
+              onChange={handleFieldChange}
+            />
+            <span className={styles.error}>{errors.confirmPassword}</span>
+          </div>
+          <div className={styles.formcheck}>
+            <div className={styles.checkloginstatus}>
+              <input type="checkbox" />
+              <p>保持登入狀態</p>
+            </div>
+            <a href="">忘記密碼？</a>
+          </div>
+          <div className={styles.mbtn} onClick={handleSubmit}>
+            <button type="submit">註冊</button>
+          </div>
+        </form>
+        {showLoginForm && (
+          <div
+            className={`offcanvas offcanvas-end show`}
+            tabIndex="-1"
+            id="offcanvasRight"
+            aria-labelledby="offcanvasRightLabel"
+          >
+            <div className="offcanvas-header">
+              <button
+                type="button"
+                className="btn-close text-reset"
+                data-bs-dismiss="offcanvas"
+                aria-label="Close"
+                onClick={() => setShowLoginForm(false)}
+              ></button>
+            </div>
+            <div className="offcanvas-body">
+              <LoginForm />
             </div>
           </div>
+        )}
+        <div className={styles.registeraccount}>
+          <p>已有帳號了嗎？</p>
+          {/* 點擊這個按鈕後切換為顯示登入表單的模式 */}
+          <button type="button" onClick={handleLoginButtonClick}>
+            由此登入
+          </button>
         </div>
       </div>
     </>

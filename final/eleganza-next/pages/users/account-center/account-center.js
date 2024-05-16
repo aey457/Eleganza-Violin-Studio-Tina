@@ -42,15 +42,15 @@ export default function AccountCenter() {
   //   newPassword: '',
   //   newPasswordConfirm: '',
   // })
-  // const [errors, setErrors] = useState({
-  //   user_useremail: '',
-  //   user_password: '',
-  //   user_phone: '',
-  //   user_name: '',
-  //   user_account: '',
-  //   newPassword: '',
-  //   newPasswordConfirm: '',
-  // })
+  const [errors, setErrors] = useState({
+    user_useremail: '',
+    user_password: '',
+    user_phone: '',
+    user_name: '',
+    user_account: '',
+    newPassword: '',
+    newPasswordConfirm: '',
+  })
 
   useEffect(() => {
     const userId = auth?.userData?.id // 或者任何你想要的使用者ID
@@ -58,42 +58,6 @@ export default function AccountCenter() {
       fetchUserDetails(userId)
     }
   }, [auth])
-
-  // useEffect(() => {
-  //   const fetchUserData = async () => {
-  //     try {
-  //       const accessToken = localStorage.getItem('accessToken')
-  //       if (!accessToken) return
-
-  //       const parseJwt = (token) => {
-  //         const base64Payload = token.split('.')[1]
-  //         const payload = Buffer.from(base64Payload, 'base64')
-  //         return JSON.parse(payload.toString())
-  //       }
-
-  //       const userData = parseJwt(accessToken)
-  //       setUser(userData)
-
-  //       const response = await fetch(
-  //         `http://localhost:3005/api/home-myaccount/${userData.id}`,
-  //         {
-  //           headers: {
-  //             Authorization: `Bearer ${accessToken}`,
-  //           },
-  //         },
-  //       )
-  //       if (!response.ok) throw new Error('Failed to fetch user details')
-  //       const data = await response.json()
-  //       setUser(data.user)
-  //       // console.log(userData)
-  //     } catch (error) {
-  //       console.error('Error fetching user details:', error)
-  //       // 在這裡處理錯誤，例如顯示一個錯誤提示給用戶
-  //     }
-  //   }
-
-  //   fetchUserData()
-  // }, [])
 
   const handleFieldChange = (e) => {
     const { name, value } = e.target
@@ -106,28 +70,35 @@ export default function AccountCenter() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    // let hasErrors = false
-    // // const { user_password, newPassword, newPasswordConfirm } = user
-    // const newErrors = { password: '', newPassword: '', newPasswordConfirm: '' }
+    const newErrors = {
+      user_password: '',
+      newPassword: '',
+      newPasswordConfirm: '',
+    }
+    let hasErrors = false
 
-    // 驗證舊密碼
-    // if (!user.user_password) {
-    //   setErrors((prevErrors) => ({
-    //     ...prevErrors,
-    //     user_password: '舊密碼不能為空',
-    //   }))
-    //   return
-    // }
+    if (userDetails.user_password == userDetails.newPassword) {
+      newErrors.user_password = '新密碼不可與舊密碼一樣'
+      newErrors.newPassword = '新密碼不可與舊密碼一樣'
+      hasErrors = true
+    }
 
-    // 驗證新密碼和確認新密碼是否相符
-    // if (user.newPassword !== user.newPasswordConfirm) {
-    //   setErrors((prevErrors) => ({
-    //     ...prevErrors,
-    //     newPassword: '新密碼和確認新密碼不一致',
-    //     newPasswordConfirm: '新密碼和確認新密碼不一致',
-    //   }))
-    //   return
-    // }
+    if (userDetails.newPassword !== userDetails.newPasswordConfirm) {
+      newErrors.newPassword = '新密碼與確認密碼需要一致'
+      newErrors.newPasswordConfirm = '新密碼與確認密碼需要一致'
+      hasErrors = true
+    }
+
+    if (userDetails.newPassword && !userDetails.newPasswordConfirm) {
+      newErrors.newPasswordConfirm = '*確認密碼為必填'
+      hasErrors = true
+    }
+
+    setErrors(newErrors)
+
+    if (hasErrors) {
+      return
+    }
 
     // 更新用戶資料
     const updatedUserData = {
@@ -212,6 +183,7 @@ export default function AccountCenter() {
                       value={userDetails?.user_password}
                       onChange={handleFieldChange}
                     />
+                    <span className={styles.error}>{errors.user_password}</span>
                     <input
                       className={styles['formstyle']}
                       type="password"
@@ -220,6 +192,7 @@ export default function AccountCenter() {
                       value={userDetails?.newPassword}
                       onChange={handleFieldChange}
                     />
+                    <span className={styles.error}>{errors.newPassword}</span>
                     <input
                       className={styles['formstyle']}
                       type="password"
@@ -228,13 +201,11 @@ export default function AccountCenter() {
                       value={userDetails?.newPasswordConfirm}
                       onChange={handleFieldChange}
                     />
+                    <span className={styles.error}>
+                      {errors.newPasswordConfirm}
+                    </span>
                     <div className={styles['xsbtn']}>
-                      <button
-                        type="submit"
-                        //onClick={(e) => updateProfile(e, user)}
-                      >
-                        儲存
-                      </button>
+                      <button type="submit">儲存</button>
                     </div>
                   </div>
                 </div>
@@ -315,6 +286,7 @@ export default function AccountCenter() {
                   value={userDetails?.user_password}
                   onChange={handleFieldChange}
                 />
+                <span className={styles.error}>{errors.user_password}</span>
                 <input
                   className={styles['formstyle']}
                   type="password"
@@ -323,6 +295,7 @@ export default function AccountCenter() {
                   value={userDetails?.newPassword}
                   onChange={handleFieldChange}
                 />
+                <span className={styles.error}>{errors.newPassword}</span>
                 <input
                   className={styles['formstyle']}
                   type="password"
@@ -331,15 +304,13 @@ export default function AccountCenter() {
                   value={userDetails?.newPasswordConfirm}
                   onChange={handleFieldChange}
                 />
+                <span className={styles.error}>
+                  {errors.newPasswordConfirm}
+                </span>
               </div>
             </div>
             <div className={styles['xsbtn']}>
-              <button
-                type="submit"
-                //onClick={(e) => updateProfile(e, user)}
-              >
-                儲存
-              </button>
+              <button type="submit">儲存</button>
             </div>
           </form>
         </div>

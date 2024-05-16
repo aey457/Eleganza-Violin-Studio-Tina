@@ -1,9 +1,11 @@
-import React, { useState } from 'react'
+import { useState, useEffect } from 'react';
 import classNames from 'classnames'
 import animation from './CSS/animation.module.css'
 import pageCart from './CSS/page_cart.module.css'
 import pageCheckOut from './CSS/page_check_out.module.css'
 import pageComplete from './CSS/page_complete.module.css'
+import axios from 'axios';
+import { useRouter } from 'next/router';
 
 const ShoppingCart = () => {
   const [progress, setProgress] = useState(10)
@@ -39,6 +41,49 @@ const ShoppingCart = () => {
   }
 
   const confirmPaymentBtn = () => {
+
+    const emailInput = document.querySelector('input[type="email"]');
+    const telInput = document.querySelector('input[type="tel"]');
+    const nameInput = document.querySelector('input[aria-label="姓名"]');
+    const selectedPaymentMethod = document.getElementById('payment-method').value;
+    const selectedShippingMethod = document.getElementById('shipping-method').value;
+
+    // 檢查選擇的寄送方式是否為預設值
+    if (selectedShippingMethod === 'shipping-method') {
+      alert('請選擇有效的寄送方式');
+      return;
+    }
+
+    // 檢查選擇的付款方式是否為預設值
+    if (selectedPaymentMethod === 'payment-method') {
+      alert('請選擇有效的付款方式');
+      return;
+    }
+
+    // 防禦性檢查以確保 input 元素都存在並且不為空
+    if (!emailInput || !telInput || !nameInput) {
+      console.error('Input elements not found');
+      return;
+    }
+
+    // 檢查姓名是否為空
+    if (!nameInput.value.trim()) {
+      alert('請輸入姓名');
+      return;
+    }
+
+    // 檢查電子郵件是否為空並且是否符合格式
+    if (!emailInput.value || !emailInput.validity.valid) {
+      alert('請輸入有效的電子郵件地址');
+      return;
+    }
+
+    // 檢查電話號碼是否為空並且是否符合格式
+    if (!telInput.value || !telInput.validity.valid) {
+      alert('請輸入有效的電話號碼（10位數字）');
+      return;
+    }
+
     setCheckoutAnimation(false)
     setPageCartAnimation(false)
     setTimeout(() => {
@@ -78,6 +123,87 @@ const ShoppingCart = () => {
     // 切換帳單地址的可見性
     setIsBillingAddressVisible(!event.target.checked)
   }
+
+  const [cartItems, setCartItems] = useState([]); // 用於存儲購物車項目
+  const [total, setTotal] = useState(0); // 用於存儲購物車總金額
+  const [itemCount, setItemCount] = useState(0); // 用於存儲購物車商品數量
+  const [userId, setUserId] = useState(''); // 從 URL 中獲取 userId
+
+  const router = useRouter();
+
+  useEffect(() => {
+    fetchCart();
+  }, []); // 在頁面加載時觸發一次
+
+  // 獲取購物車數據
+  const fetchCart = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3005/api/cart/:userId`);
+      const { cartItems, total } = response.data.data;
+
+      // 更新狀態
+      setCartItems(cartItems);
+      setTotal(total);
+      setItemCount(cartItems.length); // 更新商品數量
+    } catch (error) {
+      console.error('獲取購物車時出錯:', error);
+    }
+  };
+
+  // 在組件掛載時設置 userId
+  useEffect(() => {
+    const userIdParam = router.query.userId || '';
+    setUserId(userIdParam);
+  }, [router.query.userId]);
+
+  // 當 userId 改變時重新獲取購物車數據
+  useEffect(() => {
+    if (userId) {
+      fetchCart();
+    }
+  }, [userId]);
+
+  const updateQuantity = async (index, newQuantity) => {
+    const updatedCartItems = [...cartItems];
+    const cartItem = updatedCartItems[index];
+
+    if (newQuantity < 1) {
+      updatedCartItems.splice(index, 1);
+      setCartItems(updatedCartItems);
+      const newTotal = updatedCartItems.reduce((total, cartItem) => {
+        const price = cartItem.product_price || cartItem.course_price;
+        return total + price * cartItem.quantity;
+      }, 0);
+      setTotal(newTotal);
+      setItemCount(updatedCartItems.length);
+
+      try {
+        await axios.post(`http://localhost:3005/api/cart/decrease/${cartItem.shopping_cart_id}`, { product_id: cartItem.product_id, course_id: cartItem.course_id });
+      } catch (error) {
+        console.error('減少購物車中商品時出錯:', error);
+      }
+    } else {
+      updatedCartItems[index] = {
+        ...updatedCartItems[index],
+        quantity: newQuantity
+      };
+      setCartItems(updatedCartItems);
+      const newTotal = updatedCartItems.reduce((total, cartItem) => {
+        const price = cartItem.product_price || cartItem.course_price;
+        return total + price * cartItem.quantity;
+      }, 0);
+      setTotal(newTotal);
+
+      try {
+        await axios.put(`http://localhost:3005/api/cart/update/${cartItem.shopping_cart_id}`, { quantity: newQuantity });
+      } catch (error) {
+        console.error('更新購物車數量時出錯:', error);
+      }
+    }
+  };
+
+
+
 
   return (
     <>
@@ -136,6 +262,7 @@ const ShoppingCart = () => {
           <div className={pageCart.step}>填寫付款細節</div>
           <div className={pageCart.step}>購買成功</div>
         </div>
+
         <div
           className={classNames(
             pageCart['page-cart'],
@@ -144,68 +271,76 @@ const ShoppingCart = () => {
           )}
           id="page-cart"
         >
-          <div className={pageCart.product} id="product">
-            <article className={`${pageCart['product-card-middle']}`}>
-              <img
-                src="product-img&course-course_img"
-                className={`${pageCart['product-image-c']}`}
-                loading="lazy"
-              />
-              <section className={`${pageCart['product-info']}`}>
-                <h2 className={`${pageCart['lesson-title']}`}>
-                  product-product_name&course-course_name
-                </h2>
-                <p className={`${pageCart['teacher-name']}`}>teacher-t_name 教師</p>
-                {/* <time className={`${pageCart['lesson-datetime']}`}>
-                  2024/11/01, 18:00~20:00
-                </time> */}
+          <div className={pageCart.cartContainer}>
+            {/* 遍歷購物車項目並顯示 */}
+            {cartItems.map((item, index) => (
+
+              <div className={pageCart.product} key={item.id}>
+                <article className={pageCart['product-card-middle']}>
+                  <img
+                    src={`/images/${item.img ? 'product_images/' + item.img : 'course_images/' + item.course_img}`}
+                    className={pageCart['product-image-c']}
+                    loading="lazy"
+                  />
+                  {/* src={`@/public/images/product_images/${item.product_img || `@/public/images/course_images/${item.course_img`} */}
+                  <section className={pageCart['product-info']}>
+                    <h2>
+                      {item.name || item.course_name}{' '}
+                      {/* 顯示商品或課程名稱 */}
+                    </h2>
+                    {item.course_name && (
+                      <p>{item.teacher_name} 教師</p>
+                    )}
+                  </section>
+                  <div className={pageCart['quantity-selector']}>
+                    <button
+                      className={pageCart['quantity-minus']}
+                      onClick={() => updateQuantity(index, item.quantity - 1)}
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      value={item.quantity}
+                      className={pageCart['quantity-input']}
+                      onChange={(e) =>
+                        updateQuantity(index, parseInt(e.target.value, 10))
+                      }
+                    />
+                    <button
+                      className={pageCart['quantity-plus']}
+                      onClick={() => updateQuantity(index, item.quantity + 1)}
+                    >
+                      +
+                    </button>
+                  </div>
+                  <p className={pageCart['product-price']}>
+                    ${(item.product_price || item.course_price) * item.quantity}{' '}
+                    {/* 顯示商品價格乘以數量 */}
+                  </p>
+                </article>
+              </div>
+            ))}
+
+            {/* 購物車總結信息 */}
+            <div className={pageCart.cart} id="cart">
+              <section className={pageCart.cartSummary}>
+                <h2 className={pageCart.cartSummary}>共{itemCount}項商品</h2>
+                <div className={pageCart.subtotalContainer}>
+                  <span>小計</span>
+                  <span>${total}</span> {/* 顯示購物車總金額 */}
+                </div>
+                <button
+                  className={pageCart.checkoutButton}
+                  onClick={handleButtonClick}
+                >
+                  前往付款
+                </button>
               </section>
-              <div className={`${pageCart['quantity-selector']}`}>
-                <img
-                  src="減少商品數量"
-                  className={`${pageCart['quantity-minus']}`}
-                />
-                <input
-                  type="number"
-                  defaultValue={1}
-                  className={`${pageCart['quantity-input']}`}
-                />
-                <img
-                  src="增加商品數量"
-                  alt="Increase quantity"
-                  className={`${pageCart['quantity-plus']}`}
-                />
-              </div>
-              <p className={`${pageCart['product-price']}`}>$ product-product_price&course-course_price</p>
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets/TEMP/56bb5e88fb78f3e7e89560a544073630784608309879b88c8af098c7f5ab25ac?apiKey=c27276553397403aa6ef8985c3e17cb4&"
-                alt="Remove item"
-                className={`${pageCart['delete-icon']}`}
-              />
-            </article>
-          </div>
-          <div className={pageCart.cart} id="cart">
-            <section className={`${pageCart['cart-summary']}`}>
-              <h2 className={`${pageCart['cart-item-count']}`}>共4項商品</h2>
-              <div className={`${pageCart['subtotal-container']}`}>
-                <span className={`${pageCart['subtotal-label']}`}>小計</span>
-                <span className={`${pageCart['subtotal-amount']}`}>
-                  $計算價格
-                </span>
-              </div>
-              <p className={`${pageCart['shipping-note']}`}>
-                運費將於結帳時計算
-              </p>
-              <button
-                className={`${pageCart['checkout-button']}`}
-                id="animateBtn"
-                onClick={handleButtonClick}
-              >
-                前往付款
-              </button>
-            </section>
+            </div>
           </div>
         </div>
+
         {/*                            付款頁面                             */}
 
         <div
@@ -232,12 +367,16 @@ const ShoppingCart = () => {
               className={`${pageCheckOut['input-field']}`}
               placeholder="電子郵件"
               aria-label="電子郵件"
+              pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+              title="請輸入有效的電子郵件地址"
             />
             <input
               type="tel"
               className={`${pageCheckOut['input-field']}`}
               placeholder="電話號碼"
               aria-label="電話號碼"
+              pattern="[0-9]{10}"
+              title="請輸入有效的電話號碼（10位數字）"
             />
             <h2 className={`${pageCheckOut['shipping-method-title']}`}>
               選擇寄送方式
@@ -250,7 +389,8 @@ const ShoppingCart = () => {
                 value={selectedShippingMethod}
               >
                 <option value="shipping-method">選擇寄送方式</option>
-                <option value="pickup">現場取貨</option>
+                <option value="pickup">於本中心領貨</option>
+                <option value="pickup_course">於本中心上課</option>
                 <option value="home_delivery">送貨到府</option>
               </select>
             </div>
@@ -376,7 +516,7 @@ const ShoppingCart = () => {
               確認付款
             </button>
           </div>
-          {/*                             付款細節                          */}
+          {/* 付款細節                         
           <div
             className={`${pageCheckOut['product-summary']}`}
             id="product-summary"
@@ -398,85 +538,42 @@ const ShoppingCart = () => {
                 />
               </div>
             </div>
-          </div>
+          </div> */}
           {/* 手風琴中的內容 */}
           <div
             className={`${pageCheckOut['product-list']} ${pageCheckOut['collapsed992']}`}
             id="product-list"
           >
             <section>
-              <article className={`${pageCheckOut['product-item']}`}>
-                <div className={`${pageCheckOut['product-image']}`}>
-                  <img
-                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/9cc8942c6894dd8f11e0c920c451d72effa179041967d336d10571a26fc990e6?apiKey=c27276553397403aa6ef8985c3e17cb4&"
-                    alt="Karl Höfner Allegro 3/4 Violin Outfit"
-                  />
-                </div>
-                <div className={`${pageCheckOut['product-details']}`}>
-                  <div className={`${pageCheckOut['product-info']}`}>
-                    <div className={`${pageCheckOut['product-brand']}`}>
-                      Karl Höfner
+              {cartItems.map((item, index) => (
+                <div key={index}>
+                  <article className={pageCheckOut['product-item']}>
+                    <div className={pageCheckOut['product-image']}>
+                      <img
+                        src={`/images/${item.img ? 'product_images/' + item.img : 'course_images/' + item.course_img}`}
+                        alt="Karl Höfner Allegro 3/4 Violin Outfit"
+                      />
                     </div>
-                    <div className={`${pageCheckOut['product-name']}`}>
-                      Allegro 3/4 Violin Outfit
+                    <div className={pageCheckOut['product-details']}>
+                      <div className={pageCheckOut['product-info']}>
+                        <h2>
+                          {item.name || item.course_name}{' '}
+                          {/* 顯示商品或課程名稱 */}
+                        </h2>
+                        {item.name || item.course_name}
+                        {/* 只有在讀取 course_name 時顯示教師名稱 */}
+                      </div>
+                      <div className={pageCheckOut['product-price']}>
+                        ${(item.product_price || item.course_price) * item.quantity}{' '}
+                        {/* 顯示商品價格 */}
+                      </div>
+                      <div className={pageCheckOut['product-quantity1']}>
+                        {item.quantity}
+                      </div>
                     </div>
-                  </div>
-                  <div className={`${pageCheckOut['product-price']}`}>
-                    $8,5000
-                  </div>
-                  <div className={`${pageCheckOut['product-quantity1']}`}>
-                    1
-                  </div>
+                  </article>
                 </div>
-              </article>
-              <article className={`${pageCheckOut['product-item']}`}>
-                <div className={`${pageCheckOut['product-image']}`}>
-                  <img
-                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/9cc8942c6894dd8f11e0c920c451d72effa179041967d336d10571a26fc990e6?apiKey=c27276553397403aa6ef8985c3e17cb4&"
-                    alt="Karl Höfner Allegro 3/4 Violin Outfit"
-                  />
-                </div>
-                <div className={`${pageCheckOut['product-details']}`}>
-                  <div className={`${pageCheckOut['product-info']}`}>
-                    <div className={`${pageCheckOut['product-brand']}`}>
-                      Karl Höfner
-                    </div>
-                    <div className={`${pageCheckOut['product-name']}`}>
-                      Allegro 3/4 Violin Outfit
-                    </div>
-                  </div>
-                  <div className={`${pageCheckOut['product-price']}`}>
-                    $8,5000
-                  </div>
-                  <div className={`${pageCheckOut['product-quantity1']}`}>
-                    1
-                  </div>
-                </div>
-              </article>
-              <article className={`${pageCheckOut['product-item']}`}>
-                <div className={`${pageCheckOut['product-image']}`}>
-                  <img
-                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/9cc8942c6894dd8f11e0c920c451d72effa179041967d336d10571a26fc990e6?apiKey=c27276553397403aa6ef8985c3e17cb4&"
-                    alt="Karl Höfner Allegro 3/4 Violin Outfit"
-                  />
-                </div>
-                <div className={`${pageCheckOut['product-details']}`}>
-                  <div className={`${pageCheckOut['product-info']}`}>
-                    <div className={`${pageCheckOut['product-brand']}`}>
-                      Karl Höfner
-                    </div>
-                    <div className={`${pageCheckOut['product-name']}`}>
-                      Allegro 3/4 Violin Outfit
-                    </div>
-                  </div>
-                  <div className={`${pageCheckOut['product-price']}`}>
-                    $8,5000
-                  </div>
-                  <div className={`${pageCheckOut['product-quantity1']}`}>
-                    1
-                  </div>
-                </div>
-              </article>
+              ))}
               <div className={`${pageCheckOut['order-summary']}`}>
                 <div className={`${pageCheckOut['order-discounts']}`}>
                   <div className={`${pageCheckOut['shipping-row']}`}>
@@ -484,14 +581,14 @@ const ShoppingCart = () => {
                       運費
                     </div>
                     <div className={`${pageCheckOut['shipping-amount']}`}>
-                      +$280
+                      +$100
                     </div>
                   </div>
                 </div>
                 <div className={`${pageCheckOut['order-total']}`}>
                   <div className={`${pageCheckOut['total-label']}`}>總計</div>
                   <div className={`${pageCheckOut['total-amount']}`}>
-                    $3,3580
+                    ${total + 100}
                   </div>
                 </div>
               </div>
@@ -509,69 +606,55 @@ const ShoppingCart = () => {
             <h1 className={`${pageComplete['order-complete-title']}`}>
               訂單已完成
             </h1>
-            <section className={`${pageComplete['product-item1']}`}>
-              <div className={`${pageComplete['product-image-wrapper']}`}>
-                <img
-                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/3a79c711ed1c7ee27ce78029780bf227a43d8cd32014909f2c9535a385bb8437?apiKey=c27276553397403aa6ef8985c3e17cb4&"
-                  alt="Product Image"
-                  className={`${pageComplete['product-image']}`}
-                />
-              </div>
-              <div className={`${pageComplete['product-details']}`}>
-                <div className={`${pageComplete['product-info']}`}>
-                  <p className={`${pageComplete['product-brand']}`}>
-                    Karl Höfner
-                  </p>
-                  <h2 className={`${pageComplete['product-name']}`}>
+            {cartItems.map((item, index) => (
+              <div key={index}>
+                <section className={`${pageComplete['product-item1']}`}>
+                  <div className={`${pageComplete['product-image-wrapper']}`}>
+                    <img
+                      src={`/images/${item.img ? 'product_images/' + item.img : 'course_images/' + item.course_img}`}
+                      alt="Product Image"
+                      className={`${pageComplete['product-image']}`}
+                    />
+                  </div>
+                  <div className={`${pageComplete['product-details']}`}>
+                    <div className={`${pageComplete['product-info']}`}>
+                      <p className={`${pageComplete['product-brand']}`}>
+                        {item.name || item.course_name}{' '}
+                      </p>
+                      {/* <h2 className={`${pageComplete['product-name']}`}>
                     Allegro 3/4 Violin Outfit
-                  </h2>
-                </div>
-                <p className={`${pageComplete['product-price']}`}>$8,5000</p>
-                <p className={`${pageComplete['product-quantity']}`}>1</p>
+                  </h2> */}
+                    </div>
+                    <p className={`${pageComplete['product-price']}`}> ${item.product_price || item.course_price}{' '}</p>
+                    <p className={`${pageComplete['product-quantity']}`}>{item.quantity}</p>
+                  </div>
+                </section>
               </div>
-            </section>
-            <section className={`${pageComplete['product-item1']}`}>
-              <div className={`${pageComplete['product-image-wrapper']}`}>
-                <img
-                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/3a79c711ed1c7ee27ce78029780bf227a43d8cd32014909f2c9535a385bb8437?apiKey=c27276553397403aa6ef8985c3e17cb4&"
-                  alt="Product Image"
-                  className={`${pageComplete['product-image']}`}
-                />
-              </div>
-              <div className={`${pageComplete['product-details']}`}>
-                <div className={`${pageComplete['product-info']}`}>
-                  <p className={`${pageComplete['product-brand']}`}>
-                    Karl Höfner
-                  </p>
-                  <h2 className={`${pageComplete['product-name']}`}>
-                    Allegro 3/4 Violin Outfit
-                  </h2>
-                </div>
-                <p className={`${pageComplete['product-price']}`}>$8,5000</p>
-                <p className={`${pageComplete['product-quantity']}`}>1</p>
-              </div>
-            </section>
-            <section className={`${pageComplete['product-item1']}`}>
-              <div className={`${pageComplete['product-image-wrapper']}`}>
-                <img
-                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/3a79c711ed1c7ee27ce78029780bf227a43d8cd32014909f2c9535a385bb8437?apiKey=c27276553397403aa6ef8985c3e17cb4&"
-                  alt="Product Image"
-                  className={`${pageComplete['product-image']}`}
-                />
-              </div>
-              <div className={`${pageComplete['product-details']}`}>
-                <div className={`${pageComplete['product-info']}`}>
-                  <p className={`${pageComplete['product-brand']}`}>
-                    Karl Höfner
-                  </p>
-                  <h2 className={`${pageComplete['product-name']}`}>
-                    Allegro 3/4 Violin Outfit
-                  </h2>
-                </div>
-                <p className={`${pageComplete['product-price']}`}>$8,5000</p>
-                <p className={`${pageComplete['product-quantity']}`}>1</p>
-              </div>
-            </section>
+            ))}
+            {/* <article className={pageCheckOut['product-item']}>
+                    <div className={pageCheckOut['product-image']}>
+                      <img
+                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/9cc8942c6894dd8f11e0c920c451d72effa179041967d336d10571a26fc990e6?apiKey=c27276553397403aa6ef8985c3e17cb4&"
+                        alt="Karl Höfner Allegro 3/4 Violin Outfit"
+                      />
+                    </div>
+                    <div className={pageCheckOut['product-details']}>
+                      <div className={pageCheckOut['product-info']}>
+                        <h2>
+                          {item.name || item.course_name}{' '}
+
+                        </h2>
+                        {item.name || item.course_name}
+
+                      </div>
+                      <div className={pageCheckOut['product-price']}>
+                        ${(item.product_price || item.course_price) * item.quantity}{' '}
+                      </div>
+                      <div className={pageCheckOut['product-quantity1']}>
+                        {item.quantity}
+                      </div>
+                    </div>
+                  </article> */}
             <section className={`${pageComplete['order-summary1']}`}>
               <div className={`${pageComplete['order-summary-row']}`}>
                 <p className={`${pageComplete['order-summary-label']}`}>
@@ -586,13 +669,13 @@ const ShoppingCart = () => {
                   下單日期
                 </p>
                 <p className={`${pageComplete['order-summary-value']}`}>
-                  2024/12/6
+                  {new Date().toLocaleDateString('zh-Hant')}
                 </p>
               </div>
               <div className={`${pageComplete['order-summary-row']}`}>
                 <p className={`${pageComplete['order-summary-label']}`}>總計</p>
                 <p className={`${pageComplete['order-summary-value']}`}>
-                  $3,3580
+                  ${total}
                 </p>
               </div>
             </section>
@@ -606,7 +689,7 @@ const ShoppingCart = () => {
             </div>
           </main>
         </div>
-      </main>
+      </main >
     </>
   )
 }

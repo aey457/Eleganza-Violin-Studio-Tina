@@ -33,7 +33,7 @@ const Login = () => {
       <div className={`${eleganza['empty-cart-container']}`}>
         <section>
           <p className={`${eleganza['empty-cart-message']}`}>請登入帳號</p>
-          <a href="http://localhost:3000/login1" className={`${eleganza['shop-now-button']}`}>
+          <a href="http://localhost:3000/login2" className={`${eleganza['shop-now-button']}`}>
             前往登入
           </a>
         </section>

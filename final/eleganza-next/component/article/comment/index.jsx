@@ -2,25 +2,22 @@ import React, { useState } from 'react'
 import styles from './comment.module.scss'
 import CommentCard from './CommentCard'
 import StarRating from '../star-rating'
-import CommentData from '@/data/comment.json'
 
 export default function CommentsPage({
   userId,
   articleId,
   productId,
   courseId,
+  comments: initialComments, // 使用不同的名字来避免命名冲突
 }) {
-  // console.log('當前用戶狀態', user)
-  const [showModal, setShowModal] = useState(false) // 控制模態窗口的顯示狀態
+  const [showModal, setShowModal] = useState(false)
+  const [comments, setComments] = useState(initialComments) // 初始化时使用传入的评论数据
 
-  // 调整 toggleModal 函数以检查用户登录状态
+  const addCommentToList = (newComment) => {
+    setComments((prevComments) => [...prevComments, newComment])
+  }
+
   const toggleModal = () => {
-    if (!userId) {
-      // 如果用户未登录，显示提示信息
-      alert('請先登入後評論')
-      return // 提前返回，不执行后续打开模态窗口的操作
-    }
-    // 如果用户已登录，切换模态窗口的显示状态
     setShowModal((prev) => !prev)
   }
 
@@ -37,26 +34,38 @@ export default function CommentsPage({
           articleId={articleId}
           productId={productId}
           courseId={courseId}
+          addCommentToList={addCommentToList}
         />
       )}
-      {CommentData.map((comment, index) => (
-        <CommentCard key={index} comment={comment} />
+      {comments.map((comment) => (
+        <CommentCard
+          key={comment.comment_id}
+          comment={comment}
+          star={comment}
+        />
       ))}
     </>
   )
 }
 
 // 定義模態窗口組件-----------------------------------
-function Modal({ toggleModal, userId, articleId, productId, courseId }) {
+function Modal({
+  toggleModal,
+  userId,
+  articleId,
+  productId,
+  courseId,
+  addCommentToList,
+}) {
   const [rating, setRating] = useState(0)
   const [commentText, setCommentText] = useState('')
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    //會員假資料
+    //會員資料
     const formData = {
-      userId: userId, // 用户ID
-      articleId: articleId.article_id, // 文章ID
+      userId: 0, // 用户ID 等會員接起來
+      articleId: articleId, // 文章ID
       productId: productId,
       courseId: courseId,
       rating: rating,
@@ -80,11 +89,13 @@ function Modal({ toggleModal, userId, articleId, productId, courseId }) {
       })
 
       if (response.ok) {
+        const newComment = await response.json()
+        addCommentToList(newComment.data.comment)
         console.log('評論提交成功')
         setRating(0) // 重設評分
         setCommentText('') // 清空評論框
         alert('評論已提交') // 提供用戶反饋
-        toggleModal() // 關閉模態框
+        toggleModal()
       } else {
         throw new Error('Network response was not ok.')
       }
@@ -94,6 +105,7 @@ function Modal({ toggleModal, userId, articleId, productId, courseId }) {
     }
   }
 
+  // 表單
   return (
     <div className={styles['modal-background']}>
       <div className={styles['modal-content']}>

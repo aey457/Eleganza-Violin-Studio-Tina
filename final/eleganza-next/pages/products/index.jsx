@@ -8,9 +8,14 @@ import Link from 'next/link'
 
 export default function Products() {
   const [products, setProducts] = useState([])
+  const [productCate, setProductCate] = useState(0)
+  const [checkboxStatus, setCheckboxStatus] = useState(false)
+  const [filterProduct, setFilterProduct] = useState(products)
+  const [selectedOption, setSelectedOption] = useState('預設排序')
+
+  // 取得產品數據
   const getProduct = async () => {
     const url = 'http://localhost:3005/api/products'
-
     try {
       const res = await fetch(url)
       const data = await res.json()
@@ -18,6 +23,7 @@ export default function Products() {
 
       if (Array.isArray(data.data.products)) {
         setProducts(data.data.products)
+        setFilterProduct(data.data.products)
         //   console.log('success')
         //   console.log(products)
       } else {
@@ -27,13 +33,37 @@ export default function Products() {
       console.log(e)
     }
   }
-  useEffect(() => {
-    // 頁面初次渲染之後伺服器要求資料
-    getProduct()
-  }, [])
+
+  // 產品分類
+  const handleCateClick = async (cateIndex) => {
+    setProductCate(cateIndex)
+    const url = `http://localhost:3005/api/products`
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cateIndex }),
+      })
+      const data = await res.json()
+
+      if (Array.isArray(data.data.products)) {
+        setProducts(data.data.products)
+        setFilterProduct(data.data.products)
+        setCheckboxStatus(false)
+        setSelectedOption('預設排序')
+
+        //   console.log('success')
+      } else {
+        alert('u mom is dead')
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   // 篩選checkbox 父元素提升
-  const [checkboxStatus, setCheckboxStatus] = useState(false)
   const handleCheckboxStatus = (option) => {
     setCheckboxStatus((prevStatus) => ({
       ...prevStatus,
@@ -41,13 +71,163 @@ export default function Products() {
     }))
   }
 
-  // 商品類別篩選 父元素提升
-  const [productCate, setProductCate] = useState(0)
-  const cates = ['小提琴', '提琴盒', '提琴弓', '松香']
+  // 商品篩選
+  const queryParams = []
+  const addedKeys = new Set()
+  const filterKeys = Object.entries(checkboxStatus)
+
+  filterKeys.forEach(([key, value]) => {
+    products.forEach((product) => {
+      if (addedKeys.has(key)) {
+        return
+      }
+      if (product.brand === key && value === true) {
+        addedKeys.add(key)
+        queryParams.push({ brand: key })
+      } else if (product.size == key && value === true) {
+        addedKeys.add(key)
+        queryParams.push({ size: key })
+      } else if (key.includes('頂板') && value === true) {
+        let formattedKey = key.replace('頂板', '')
+        addedKeys.add(key)
+        queryParams.push({ top: formattedKey })
+      } else if (key.includes('側板') && value === true) {
+        let formattedKey = key.replace('側板', '')
+        addedKeys.add(key)
+        queryParams.push({ back_and_sides: formattedKey })
+      } else if (key.includes('指板') && value === true) {
+        let formattedKey = key.replace('指板', '')
+        addedKeys.add(key)
+        queryParams.push({ fingerboard: formattedKey })
+      } else if (key.includes('琴頸') && value === true) {
+        let formattedKey = key.replace('琴頸', '')
+        addedKeys.add(key)
+        queryParams.push({ neck: formattedKey })
+      }
+    })
+  })
+
+  //   console.log(queryParams)
+
+  const handleFilterChange = () => {
+    const seenProductIds = new Set()
+    let filteredProducts = []
+
+    if (queryParams.length === 0) {
+      setFilterProduct(products)
+      return
+    }
+
+    // 遍歷每個篩選條件
+    queryParams.forEach((qp) => {
+      const key = Object.keys(qp)[0]
+      const value = Object.values(qp)[0]
+
+      // 對每個篩選條件進行篩選
+      const filtered = products
+        .filter((product) => {
+          return product[key] === value
+        })
+        .filter((product) => {
+          if (!seenProductIds.has(product.product_id)) {
+            seenProductIds.add(product.product_id)
+            return true
+          }
+          return false
+        })
+
+      // 將當前篩選條件下的產品加入到 filteredProducts 中
+      filteredProducts = filteredProducts.concat(filtered)
+    })
+    if (JSON.stringify(filteredProducts) !== JSON.stringify(filterProduct)) {
+      // 更新 filterProduct 狀態
+      setFilterProduct(filteredProducts)
+      setSelectedOption('預設排序')
+      // console.log(filteredProducts)
+    }
+  }
+
+  // 產品排序
+  const handleOptionClick = (option) => {
+    setSelectedOption(option)
+  }
+
+  // 產品查詢
+  const [showInput, setShowInput] = useState(false)
+  const handleClick = () => {
+    setShowInput(!showInput)
+  }
+
+  const [params, setParams] = useState('')
+  const handleSearch = (e) => {
+    const searchValue = e.target.value.toLowerCase()
+    setParams(searchValue)
+    if (params == '') {
+      setFilterProduct(products)
+    } else {
+      // 根據搜索參數過濾產品列表並更新過濾後的產品
+      const filtered = products.filter((product) =>
+        product.name.toLowerCase().includes(searchValue),
+      )
+      setFilterProduct(filtered)
+    }
+  }
+
+  const renderProductName = (productName) => {
+    const index = productName.toLowerCase().indexOf(params)
+    if (index === -1) {
+      return productName
+    }
+    return (
+      <>
+        {productName.substring(0, index)}
+        <span style={{ color: 'red', background: '#dddddd' }}>
+          {productName.substring(index, index + params.length)}
+        </span>
+        {productName.substring(index + params.length)}
+      </>
+    )
+  }
+
+  // 頁面初次渲染之後伺服器要求資料
+  useEffect(() => {
+    getProduct()
+  }, [])
+
+  // 陣列變動時重新篩選資料
+  useEffect(() => {
+    handleFilterChange()
+  }, [checkboxStatus])
+
+  useEffect(() => {
+    // 根據 selectedOption 的值對商品列表進行排序
+    switch (selectedOption) {
+      case '預設排序':
+        setFilterProduct(
+          [...filterProduct].sort((a, b) => a.product_id - b.product_id),
+        )
+        break
+      case '價格由低至高':
+        setFilterProduct(
+          [...filterProduct].sort((a, b) => a.product_price - b.product_price),
+        )
+        break
+      case '價格由高至低':
+        setFilterProduct(
+          [...filterProduct].sort((a, b) => b.product_price - a.product_price),
+        )
+        break
+      default:
+        // 不進行排序
+        break
+    }
+  }, [selectedOption])
 
   return (
     <>
       <NavTop
+        selectedOption={selectedOption}
+        handleOptionClick={handleOptionClick}
         setProducts={setProducts}
         products={products}
         checkboxStatus={checkboxStatus}
@@ -55,13 +235,19 @@ export default function Products() {
         setCheckboxStatus={setCheckboxStatus}
         productCate={productCate}
         setProductCate={setProductCate}
-        cates={cates}
+        handleCateClick={handleCateClick}
+        handleClick={handleClick}
+        showInput={showInput}
+        filterProduct={filterProduct}
+        handleSearch={handleSearch}
+        params={params}
       />
       <div className="products">
         <div className="row justify-content-between">
           <div className="col-3 d-none d-md-block">
             <FilterLeft
               products={products}
+              setProducts={setProducts}
               checkboxStatus={checkboxStatus}
               handleCheckboxStatus={handleCheckboxStatus}
               productCate={productCate}
@@ -69,14 +255,17 @@ export default function Products() {
           </div>
           <div className="col col-md-9">
             <div className="row g-3 g-xl-4 row-cols-2 row-cols-sm-3 row-cols-xl-4">
-              {products.map((product) => {
+              {filterProduct.map((product) => {
                 const { name, brand, product_price, img } = product
+                const productName = name.replace(brand, '')
+                //   console.log(productName)
+
                 return (
                   <div className="col" key={product.product_id}>
                     <Link href={`/products/${product.product_id}`}>
                       <ProductCard
-                        name={name}
-                        brand={brand}
+                        name={renderProductName(productName)}
+                        brand={renderProductName(brand)}
                         price={product_price}
                         img={img}
                       />

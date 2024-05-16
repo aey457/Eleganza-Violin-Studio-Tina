@@ -5,6 +5,8 @@ import Cards from '@/component/article/card'
 import Pagination from '@/component/article/pagination'
 // import articles from '@/data/articles.json'
 import styles from './index.module.scss'
+//import FavIcon from '@/component/article/fav/fav-icon'
+
 
 // 載入指示動畫
 // import Loader from '@/components/product/loader';
@@ -63,15 +65,35 @@ export default function Index() {
   )
 
   const handleOptionClick = (option) => {
-    let sortOption = 'newest' // 預設按日期最新排序
-    if (option === '日期最新') {
-      sortOption = 'newest'
-    } else if (option === '日期最舊') {
-      sortOption = 'oldest'
+    let sortOption
+    switch (option) {
+      case '按 ID 升序':
+        sortOption = 'id_asc'
+        break
+      case '按 ID 降序':
+        sortOption = 'id_desc'
+        break
+      case '日期最新':
+        sortOption = 'newest'
+        break
+      case '日期最舊':
+        sortOption = 'oldest'
+        break
+      default:
+        sortOption = 'id_desc' // 將預設設為按 ID 降序
     }
-    setSortOrder(sortOption) // 更新排序選項
-    fetchArticles() // 重新獲取文章
+
+    if (sortOrder !== sortOption) {
+      setSortOrder(sortOption)
+    } else {
+      fetchArticles() // 即使相同也強制更新，以應對可能的其他變數影響
+    }
   }
+
+  // 當 sortOrder 改變時，重新載入文章
+  useEffect(() => {
+    fetchArticles()
+  }, [sortOrder])
 
   return (
     <>
@@ -84,11 +106,10 @@ export default function Index() {
         onSearch={handleSearchResults}
         fetchArticles={fetchArticles} //fetchArticles 傳遞 prop
         resetPagination={() => setCurrentPage(1)} // 傳遞一個重置頁碼的函數
-        handleOptionClick={handleOptionClick} //確保傳遞這個函數
+        handleSortChange={handleOptionClick} //確保傳遞這個函數
         showSort={true}
         showSearch={true}
       />
-
       <div className={styles['cards-container']}>
         {currentArticles.map((article) => (
           <Cards

@@ -18,25 +18,28 @@ export default function Header() {
           <div className={styles.logo}>
             <a href="">ELEGANZA</a>
           </div>
-          <ul
-            className={`d-flex justify-content-between align-content-center list-unstyled m-0`}
-          >
-            <li className={styles.link}>
-              <a href="/">關於阿爾扎</a>
-            </li>
-            <li className={styles.link}>
-              <Link href="/products">商品總覽</Link>
-            </li>
-            <li className={styles.link}>
-              <Link href="/course">精選課程</Link>
-            </li>
-            <li className={styles.link}>
-              <Link href="/teacher">師資陣容</Link>
-            </li>
-            <li className={styles.link}>
-              <Link href="/article">弦樂專欄</Link>
-            </li>
-          </ul>
+          <div className="d-none d-xl-block">
+            <ul
+              className={`d-flex justify-content-between align-content-center list-unstyled m-0 `}
+            >
+              <li className={styles.link}>
+                <a href="/">關於阿爾扎</a>
+              </li>
+              <li className={styles.link}>
+                <Link href="/products">商品總覽</Link>
+              </li>
+              <li className={styles.link}>
+                <Link href="/course">精選課程</Link>
+              </li>
+              <li className={styles.link}>
+                <Link href="/teacher">師資陣容</Link>
+              </li>
+              <li className={styles.link}>
+                <Link href="/article">弦樂專欄</Link>
+              </li>
+            </ul>
+          </div>
+
           <div
             className={
               styles['header-icons'] +
@@ -54,6 +57,7 @@ export default function Header() {
                   : '/users/user-form/login'
               }
             ></Link>
+
             <button
               type="button"
               onClick={() => {
@@ -88,9 +92,58 @@ export default function Header() {
                 <LoginForm />
               </div>
             </div>
-            <a href="">
-              <img className={styles.menu} src="/icons/icon-menu-white.svg" />
-            </a>
+            {/* MENU */}
+            <button
+              className="d-block d-xl-none"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#offcanvasRightMenu"
+              aria-controls="offcanvasRightMenu"
+            >
+              <img src="/icons/icon-menu-white.svg" />
+            </button>
+            <div
+              className="offcanvas offcanvas-end"
+              tabIndex={-1}
+              id="offcanvasRightMenu"
+              aria-labelledby="offcanvasRightMenuLabel"
+            >
+              <div className="offcanvas-header">
+                <button
+                  type="button"
+                  className="btn-close text-reset"
+                  data-bs-dismiss="offcanvas"
+                  aria-label="Close"
+                />
+              </div>
+              <div className="offcanvas-body d-flex flex-column list-unstyled justify-content-between ">
+                <div className="flex-grow-1  d-flex flex-column justify-content-center">
+                  <ul className={`${styles['menu']}`}>
+                    <li className={styles.link}>
+                      <a href="/">關於阿爾扎</a>
+                    </li>
+                    <li className={styles.link}>
+                      <Link href="/products">商品總覽</Link>
+                    </li>
+                    <li className={styles.link}>
+                      <Link href="/course">精選課程</Link>
+                    </li>
+                    <li className={styles.link}>
+                      <Link href="/teacher">師資陣容</Link>
+                    </li>
+                    <li className={styles.link}>
+                      <Link href="/article">弦樂專欄</Link>
+                    </li>
+                    <li className={styles.link}>
+                      <Link href="/shopping_cart">購物車</Link>
+                    </li>
+                  </ul>
+                </div>
+                <div className={`${styles['logo-menu']}`}>
+                  <a href="">ELEGANZA</a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </header>

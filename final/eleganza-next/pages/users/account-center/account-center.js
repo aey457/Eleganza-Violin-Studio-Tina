@@ -9,10 +9,20 @@ import Link from 'next/link'
 export default function AccountCenter() {
   const [userDetails, setUserDetails] = useState(null) // 初始化為 null，因為在開始時還沒有使用者詳細資訊
 
+  const { auth, updateUserData } = useAuth()
+
   const fetchUserDetails = async (userId) => {
+    const accessToken = localStorage.getItem('accessToken')
+    if (!accessToken) return
+
     try {
       const response = await fetch(
         `http://localhost:3005/api/home-myaccount/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
       )
       if (!response.ok) throw new Error('Failed to fetch user details')
       const data = await response.json()
@@ -23,72 +33,71 @@ export default function AccountCenter() {
     }
   }
 
-  const { auth, updateProfile } = useAuth()
-  const [user, setUser] = useState({
-    user_email: '',
-    user_password: '',
-    user_phone: '',
-    user_name: '',
-    user_account: '',
-    newPassword: '',
-    newPasswordConfirm: '',
-  })
-  const [errors, setErrors] = useState({
-    user_useremail: '',
-    user_password: '',
-    user_phone: '',
-    user_name: '',
-    user_account: '',
-    newPassword: '',
-    newPasswordConfirm: '',
-  })
+  // const [user, setUser] = useState({
+  //   user_email: '',
+  //   user_password: '',
+  //   user_phone: '',
+  //   user_name: '',
+  //   user_account: '',
+  //   newPassword: '',
+  //   newPasswordConfirm: '',
+  // })
+  // const [errors, setErrors] = useState({
+  //   user_useremail: '',
+  //   user_password: '',
+  //   user_phone: '',
+  //   user_name: '',
+  //   user_account: '',
+  //   newPassword: '',
+  //   newPasswordConfirm: '',
+  // })
 
   useEffect(() => {
-    const userId = user?.id // 或者任何你想要的使用者ID
+    const userId = auth?.userData?.id // 或者任何你想要的使用者ID
     if (userId) {
       fetchUserDetails(userId)
     }
-  }, [user?.id])
+  }, [auth])
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const accessToken = localStorage.getItem('accessToken')
-        if (!accessToken) return
+  // useEffect(() => {
+  //   const fetchUserData = async () => {
+  //     try {
+  //       const accessToken = localStorage.getItem('accessToken')
+  //       if (!accessToken) return
 
-        const parseJwt = (token) => {
-          const base64Payload = token.split('.')[1]
-          const payload = Buffer.from(base64Payload, 'base64')
-          return JSON.parse(payload.toString())
-        }
+  //       const parseJwt = (token) => {
+  //         const base64Payload = token.split('.')[1]
+  //         const payload = Buffer.from(base64Payload, 'base64')
+  //         return JSON.parse(payload.toString())
+  //       }
 
-        const userData = parseJwt(accessToken)
-        setUser(userData)
+  //       const userData = parseJwt(accessToken)
+  //       setUser(userData)
 
-        const response = await fetch(
-          `http://localhost:3005/api/home-myaccount/${userData.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          },
-        )
-        if (!response.ok) throw new Error('Failed to fetch user details')
-        const data = await response.json()
-        setUser(data.user)
-        // console.log(userData)
-      } catch (error) {
-        console.error('Error fetching user details:', error)
-        // 在這裡處理錯誤，例如顯示一個錯誤提示給用戶
-      }
-    }
+  //       const response = await fetch(
+  //         `http://localhost:3005/api/home-myaccount/${userData.id}`,
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${accessToken}`,
+  //           },
+  //         },
+  //       )
+  //       if (!response.ok) throw new Error('Failed to fetch user details')
+  //       const data = await response.json()
+  //       setUser(data.user)
+  //       // console.log(userData)
+  //     } catch (error) {
+  //       console.error('Error fetching user details:', error)
+  //       // 在這裡處理錯誤，例如顯示一個錯誤提示給用戶
+  //     }
+  //   }
 
-    fetchUserData()
-  }, [])
+  //   fetchUserData()
+  // }, [])
 
   const handleFieldChange = (e) => {
     const { name, value } = e.target
-    setUser((prevUser) => ({
+    setUserDetails((prevUser) => ({
       ...prevUser,
       [name]: value,
     }))
@@ -97,17 +106,40 @@ export default function AccountCenter() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    let hasErrors = false
-    const { user_password, newPassword, newPasswordConfirm } = user
-    const newErrors = { password: '', newPassword: '', newPasswordConfirm: '' }
+    // let hasErrors = false
+    // // const { user_password, newPassword, newPasswordConfirm } = user
+    // const newErrors = { password: '', newPassword: '', newPasswordConfirm: '' }
 
-    // 驗證密碼
+    // 驗證舊密碼
+    // if (!user.user_password) {
+    //   setErrors((prevErrors) => ({
+    //     ...prevErrors,
+    //     user_password: '舊密碼不能為空',
+    //   }))
+    //   return
+    // }
 
-    setErrors(newErrors)
+    // 驗證新密碼和確認新密碼是否相符
+    // if (user.newPassword !== user.newPasswordConfirm) {
+    //   setErrors((prevErrors) => ({
+    //     ...prevErrors,
+    //     newPassword: '新密碼和確認新密碼不一致',
+    //     newPasswordConfirm: '新密碼和確認新密碼不一致',
+    //   }))
+    //   return
+    // }
 
-    if (hasErrors) return
+    // 更新用戶資料
+    const updatedUserData = {
+      user_name: userDetails.user_name,
+      user_account: userDetails.user_account,
+      user_phone: userDetails.user_phone,
+      user_password: userDetails.newPassword
+        ? userDetails.newPassword
+        : userDetails.user_password, // 可以根據需要修改成 user.new_Password
+    }
 
-    updateProfile(user)
+    updateUserData(updatedUserData)
   }
 
   return (
@@ -140,24 +172,24 @@ export default function AccountCenter() {
                       className={styles['formstyle']}
                       type="text"
                       // placeholder={user?.user_name}
-                      name="name"
-                      value={user?.user_name}
+                      name="user_name"
+                      value={userDetails?.user_name}
                       onChange={handleFieldChange}
                     />
                     <input
                       className={styles['formstyle']}
                       type="text"
                       // placeholder={userDetails?.user_phone}
-                      name="phone"
-                      value={user?.user_phone}
+                      name="user_phone"
+                      value={userDetails?.user_phone}
                       onChange={handleFieldChange}
                     />
                     <input
                       className={styles['formstyle']}
                       type="text"
                       // placeholder={userDetails?.user_account}
-                      name="account"
-                      value={user?.user_account}
+                      name="user_account"
+                      value={userDetails?.user_account}
                       onChange={handleFieldChange}
                     />
                   </div>
@@ -176,8 +208,8 @@ export default function AccountCenter() {
                       className={styles['formstyle']}
                       type="password"
                       placeholder="舊密碼"
-                      name="password"
-                      value={user?.user_password}
+                      name="user_password"
+                      value={userDetails?.user_password}
                       onChange={handleFieldChange}
                     />
                     <input
@@ -185,7 +217,7 @@ export default function AccountCenter() {
                       type="password"
                       placeholder="不可與舊密碼相同"
                       name="newPassword"
-                      value={user?.new_Password}
+                      value={userDetails?.newPassword}
                       onChange={handleFieldChange}
                     />
                     <input
@@ -193,7 +225,7 @@ export default function AccountCenter() {
                       type="password"
                       placeholder="確認新密碼"
                       name="newPasswordConfirm"
-                      value={user?.new_PasswordConfirm}
+                      value={userDetails?.newPasswordConfirm}
                       onChange={handleFieldChange}
                     />
                     <div className={styles['xsbtn']}>
@@ -245,24 +277,24 @@ export default function AccountCenter() {
                   className={styles['formstyle']}
                   type="text"
                   // placeholder={userDetails?.user_name}
-                  name="name"
-                  value={user?.user_name}
+                  name="user_name"
+                  value={userDetails?.user_name}
                   onChange={handleFieldChange}
                 />
                 <input
                   className={styles['formstyle']}
                   type="text"
                   // placeholder={userDetails?.user_phone}
-                  name="phone"
-                  value={user?.user_phone}
+                  name="user_phone"
+                  value={userDetails?.user_phone}
                   onChange={handleFieldChange}
                 />
                 <input
                   className={styles['formstyle']}
                   type="text"
                   // placeholder={userDetails?.user_account}
-                  name="account"
-                  value={user?.user_account}
+                  name="user_account"
+                  value={userDetails?.user_account}
                   onChange={handleFieldChange}
                 />
               </div>
@@ -279,8 +311,8 @@ export default function AccountCenter() {
                   className={styles['formstyle']}
                   type="password"
                   placeholder="舊密碼"
-                  name="password"
-                  value={user?.user_password}
+                  name="user_password"
+                  value={userDetails?.user_password}
                   onChange={handleFieldChange}
                 />
                 <input
@@ -288,7 +320,7 @@ export default function AccountCenter() {
                   type="password"
                   placeholder="新密碼"
                   name="newPassword"
-                  value={user?.newPassword}
+                  value={userDetails?.newPassword}
                   onChange={handleFieldChange}
                 />
                 <input
@@ -296,7 +328,7 @@ export default function AccountCenter() {
                   type="password"
                   placeholder="確認密碼"
                   name="newPasswordConfirm"
-                  value={user?.newPasswordConfirm}
+                  value={userDetails?.newPasswordConfirm}
                   onChange={handleFieldChange}
                 />
               </div>

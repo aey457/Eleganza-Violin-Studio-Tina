@@ -1,16 +1,17 @@
 import React from 'react'
 import styles from './rightcolumn.module.scss'
+import courseData from '../../../../data/coursesData.json'
 
-export default function CourseDetailRight() {
+export default function CourseDetailRight(course) {
   return (
     <>
       <div className="right-column col-6">
         <div className={styles['grid-item-right']}>
           <div className={styles['course-details-title']}>
             <p>
-              爵士&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;藍調&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;黃俊賢&nbsp;&nbsp;教師
+              {course.course_style} / {course.teacher_id}老師
             </p>
-            <h1>小提琴演奏中階個別課</h1>
+            <h1>{course.course_name}</h1>
             <div className={styles['stars-container']}>
               <div className={styles['stars']}>
                 <img src="/icons/icon-star-solid.svg" alt="" />
@@ -21,7 +22,7 @@ export default function CourseDetailRight() {
               </div>
               <p>4.3(24)</p>
             </div>
-            <h2>$1,800</h2>
+            <h2>${course.course_price}</h2>
             <p>課程時間</p>
             <div className={styles['fc-container']}>
               <div id="example" />
@@ -41,7 +42,9 @@ export default function CourseDetailRight() {
                   <img src="/icons/icon-plus.svg" alt="" />
                 </a>
               </div>
-              <button className={styles['course-add-to-cart']}>加入購物車</button>
+              <button className={styles['course-add-to-cart']}>
+                加入購物車
+              </button>
             </div>
           </div>
         </div>

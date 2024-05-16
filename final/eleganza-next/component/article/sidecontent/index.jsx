@@ -1,7 +1,7 @@
 // SideContent.jsx
 import React, { useState, useEffect } from 'react'
 import styles from './side-content.module.scss'
-import articlesData from '@/data/articles.json'
+// import articlesData from '@/data/articles.json'
 import Image from 'next/image'
 import Link from 'next/link'
 

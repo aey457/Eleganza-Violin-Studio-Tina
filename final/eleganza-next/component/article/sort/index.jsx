@@ -52,6 +52,28 @@ export default function Sort({ selectedOption, handleOptionClick }) {
                 日期最舊
               </button>
             </li>
+            <li>
+              <button
+                className={styles['dropdown-item']}
+                onClick={() => {
+                  handleOptionClick('按 ID 降序')
+                  toggleDropdown()
+                }}
+              >
+                按 ID 降序
+              </button>
+            </li>
+            <li>
+              <button
+                className={styles['dropdown-item']}
+                onClick={() => {
+                  handleOptionClick('按 ID 升序')
+                  toggleDropdown()
+                }}
+              >
+                按 ID 升序
+              </button>
+            </li>
           </ul>
         )}
       </div>

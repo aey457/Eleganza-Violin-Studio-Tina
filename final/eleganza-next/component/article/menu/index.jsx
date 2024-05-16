@@ -14,10 +14,16 @@ export default function Menu({
 }) {
   const [isVisible, setIsVisible] = useState(false)
   const toggleVisibility = () => setIsVisible(!isVisible)
+  const [selectedOption, setSelectedOption] = useState('') // 添加這一行
 
   const handleSelectCategory = (category) => {
     onSelect(category) // 更新類別
     resetPagination() // 重置頁碼到第一頁
+  }
+
+  const handleSortOptionClick = (option) => {
+    setSelectedOption(option) // 更新選擇的排序選項
+    handleSortChange(option) // 調用從父組件傳入的排序改變函數
   }
 
   const handleSearchChange = async (searchQuery) => {
@@ -73,7 +79,12 @@ export default function Menu({
             />
           )}
           {/* 排序 */}
-          {showSort && <Sort handleSortChange={handleSortChange} />}
+          {showSort && (
+            <Sort
+              selectedOption={selectedOption}
+              handleOptionClick={handleSortOptionClick}
+            />
+          )}
         </ul>
         <hr />
       </div>

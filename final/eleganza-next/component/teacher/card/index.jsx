@@ -1,41 +1,24 @@
-import { useState, useEffect } from 'react'
-import styles from './card.module.scss'
-// import teacherData from '../../../data/teachers.json'
+import React, { useState, useEffect } from 'react';
+import styles from './card.module.scss';
 
-export default function Card({ selectedCourse }) {
-  const [expandedIndex, setExpandedIndex] = useState(null)
-  const [filteredTeacherData, setFilteredTeacherData] = useState([])
+export default function Card({ teachers }) {
+  const [expandedIndex, setExpandedIndex] = useState(null);
 
   const handleIconClick = (index) => {
-    setExpandedIndex(index === expandedIndex ? null : index)
-  }
-
-  useEffect(() => {
-    const updatedTeacherData = teacherData.map((teacher) => {
-      return {
-        ...teacher,
-        courses: teacher.courses.split(',').map((course) => course.trim()),
-      }
-    })
-    const filteredData = selectedCourse
-      ? updatedTeacherData.filter((teacher) =>
-          teacher.courses.includes(selectedCourse),
-        )
-      : updatedTeacherData
-    setFilteredTeacherData(filteredData)
-  }, [selectedCourse])
+    setExpandedIndex(expandedIndex === index ? null : index);
+  };
 
   return (
     <>
-      {filteredTeacherData.map((teacher, index) => (
+      {teachers.map((teacher, index) => (
         <div key={index} className={styles['card-column']}>
           <div className={styles['card-row']}>
             <div className={styles['card-body']}>
               <div className={styles['image-container']}>
                 <img
-                  src={`/images/${teacher.t_img}`}
+                  src={`/images/teacher_images/${teacher.t_img}`}
                   className={styles['card-image']}
-                  alt=""
+                  alt={`Teacher ${teacher.t_name}`}
                 />
               </div>
               <div className={styles['card-header']}>
@@ -44,9 +27,9 @@ export default function Card({ selectedCourse }) {
                 </div>
                 <div className={styles['text-box']}>
                   <ul>
-                    <li>學歷:{teacher.education}</li>
-                    <li>教學年資:{teacher.t_years}年</li>
-                    <li>教學經歷:{teacher.experience}</li>
+                    <li>學歷: {teacher.education}</li>
+                    <li>教學年資: {teacher.t_years}年</li>
+                    <li>教學經歷: {teacher.experience}</li>
                   </ul>
                 </div>
               </div>
@@ -57,7 +40,7 @@ export default function Card({ selectedCourse }) {
                 >
                   <img
                     src="/icons/icon-chevron-down.svg"
-                    alt=""
+                    alt="Toggle Details"
                     className="expand-icon"
                   />
                 </div>
@@ -87,12 +70,10 @@ export default function Card({ selectedCourse }) {
             </div>
           </div>
           <div
-            className={`${styles['card-row']} ${
-              expandedIndex === index ? styles['expanded-row'] : ''
-            }`}
+            className={`${styles['card-row']} ${expandedIndex === index ? styles['expanded-row'] : ''}`}
           ></div>
         </div>
       ))}
     </>
-  )
+  );
 }

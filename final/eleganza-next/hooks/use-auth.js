@@ -121,37 +121,32 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const updateProfile = (user) => {
-    console.log(user.JSON)
-    const storedUserDetails = JSON.parse(localStorage.getItem('userData'))
+  const updateUserData = async (updatedData) => {
+    try {
+      const accessToken = localStorage.getItem('accessToken')
+      if (!accessToken) throw new Error('Access token not found')
 
-    const updatedUserData = {
-      name: user.username,
-      account: user.useraccount,
-      phone: user.userphone,
-      password: user.newPassword,
+      const response = await fetch(
+        `http://localhost:3005/api/home-myaccount/${auth.userData.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(updatedData),
+        },
+      )
+
+      if (!response.ok) throw new Error('Failed to update user data')
+
+      const data = await response.json()
+      console.log('User data updated successfully:', data)
+      alert('修改成功。')
+    } catch (error) {
+      console.error('Error updating user data:', error)
+      // 在這裡處理錯誤，例如顯示一個錯誤提示給用戶
     }
-
-    fetch(`http://localhost:3005/api/home-myaccount/${auth.userData.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${auth.token}`, // 添加授权头部
-      },
-      body: JSON.stringify(updatedUserData),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('Update success:', data)
-        console.log('token:', data.data.accessToken)
-        setAuth({
-          token: data.data.accessToken,
-          isLoggedIn: true,
-          userData: parseJwt(data.data.accessToken),
-          isAuth: true,
-        })
-      })
-      .catch((error) => console.error('Error updating user details:', error))
   }
 
   const handleCheck = async () => {
@@ -175,7 +170,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ auth, login, logout, updateProfile, handleCheck }}
+      value={{ auth, login, logout, updateUserData, handleCheck }}
     >
       {children}
     </AuthContext.Provider>

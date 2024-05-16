@@ -8,15 +8,51 @@ import { getIdParam } from '#db-helpers/db-tool.js'
 // 資料庫使用
 import sequelize from '#configs/db.js'
 const { Article } = sequelize.models
-// import { QueryTypes, Op } from 'sequelize'
 
 // GET - 得到所有文章資料
 router.get('/', async function (req, res) {
-  const articles = await Article.findAll({ logging: console.log })
-  // 處理如果沒找到資料
+  const sortOrder = req.query.sort || 'id_desc' // 如果沒有指定，預設為按 ID 降序
 
-  // 標準回傳JSON
-  return res.json({ status: 'success', data: { articles } })
+  let order
+  switch (sortOrder) {
+    case 'newest':
+      order = [['article_date', 'DESC']] // 最新日期
+      break
+    case 'oldest':
+      order = [['article_date', 'ASC']] // 最舊日期
+      break
+    case 'id_desc':
+      order = [['article_id', 'DESC']] // 按 ID 降序
+      break
+    case 'id_asc':
+      order = [['article_id', 'ASC']] // 按 ID 升序
+      break
+    default:
+      order = [['article_id', 'DESC']] // 預設排序為按 ID 降序
+      break
+  }
+
+  try {
+    const articles = await Article.findAll({
+      order: order,
+      logging: console.log,
+    })
+
+    if (articles.length === 0) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'No articles found',
+      })
+    }
+
+    return res.json({ status: 'success', data: { articles } })
+  } catch (error) {
+    console.error('Error fetching articles:', error)
+    return res.status(500).json({
+      status: 'error',
+      message: 'Error fetching articles',
+    })
+  }
 })
 
 //搜尋功能

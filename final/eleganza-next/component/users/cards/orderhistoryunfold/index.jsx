@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import React from 'react'
 import styles from './orderhistoryunfold.module.scss'
 import { useAuth } from '@/hooks/use-auth'
+import Link from 'next/link'
 
 export default function OrderHistoryUnfoldCard() {
   const { auth } = useAuth()
@@ -169,9 +170,9 @@ export default function OrderHistoryUnfoldCard() {
             <p>{order.status}</p>
             <div className={`${styles['checkdetail']}`}>
               <p style={{ margin: 0 }}>查看詳情</p>
-              <a href="#" onClick={toggleDetail}>
+              <Link href="#" onClick={toggleDetail}>
                 <img src="/icons/icon-chevron-down.svg" alt="" />
-              </a>
+              </Link>
             </div>
           </div>
           {/* 手機端樣式 */}
@@ -181,9 +182,9 @@ export default function OrderHistoryUnfoldCard() {
             <p>{order.order_id}</p>
             <p>{order.order_date}</p>
             <p>{order.status}</p>
-            <a href="#" onClick={toggleDetail}>
+            <Link href="#" onClick={toggleDetail}>
               <img src="/icons/icon-chevron-down.svg" alt="" />
-            </a>
+            </Link>
           </div>
           {isDetailOpen && (
             <div className={`${styles['orderhistorydetailrow']} `}>
@@ -196,7 +197,7 @@ export default function OrderHistoryUnfoldCard() {
                     <div key={index}>
                       <div className={styles.orderhistorydetail}>
                         <div className={styles.orderimg}>
-                          <a
+                          <Link
                             href={
                               item.product_id
                                 ? `/products/${item.product_id}`
@@ -207,25 +208,25 @@ export default function OrderHistoryUnfoldCard() {
                               src={
                                 item.product_id
                                   ? `/images/product_images/${item.img}`
-                                  : `/images/course_images/${item.img}`
+                                  : `/images/course_images/${item.course_img}`
                               }
                               alt={item.alt}
                             />
-                          </a>
+                          </Link>
                         </div>
                         <div className={styles.orderwords}>
                           <div className={styles.ordertitle}>
-                            <a
+                            <Link
                               href={
                                 item.product_id
                                   ? `/products/${item.product_id}`
-                                  : `/course/${item.course_id}`
+                                  : `/teacher`
                               }
                               className={styles.orderbrand}
                             >
                               {item.brand || `${item.course_teacher_name} 教師`}
-                            </a>
-                            <a
+                            </Link>
+                            <Link
                               href={
                                 item.product_id
                                   ? `/products/${item.product_id}`
@@ -233,7 +234,7 @@ export default function OrderHistoryUnfoldCard() {
                               }
                             >
                               {item.name || item.course_name}
-                            </a>
+                            </Link>
                           </div>
                           <div className={styles.orderprice}>
                             <p>{item.product_price || item.course_price}</p>

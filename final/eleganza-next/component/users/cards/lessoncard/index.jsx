@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import React from 'react'
 import styles from './lessoncard.module.scss'
 import { useAuth } from '@/hooks/use-auth'
+import Link from 'next/link'
 
 export default function LessonCard() {
   const [lessonDetails, setLessonDetails] = useState(null)
@@ -58,23 +59,28 @@ export default function LessonCard() {
       {lessons.map((v, i) => (
         <div key={v.user_id}>
           <div className={styles['lessoncard']}>
-            <img
-              src="/images/course_images/movie_soundtrack_class.jpg"
-              alt=""
-              className={styles['lessoncardimg']}
-            />
+            <Link href={`/course/${v.course_id}`}>
+              <img
+                src={`/images/course_images/${v.course_img}`}
+                alt=""
+                className={styles['lessoncardimg']}
+              />
+            </Link>
             <div className={styles['lessoncard-word']}>
               <ul className={`${styles.lessoncardtitle} list-unstyled`}>
                 <li className={styles['lessondate']}>2024/11/4</li>
                 <li>
-                  <a className={styles['lessonname']} href="">
+                  <Link
+                    className={styles['lessonname']}
+                    href={`/course/${v.course_id}`}
+                  >
                     {v.course_name}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className={styles['teachername']} href="">
+                  <Link className={styles['teachername']} href="/teacher">
                     {v.course_teacher_name} 教師
-                  </a>
+                  </Link>
                 </li>
               </ul>
               <ul className={`list-unstyled`}>

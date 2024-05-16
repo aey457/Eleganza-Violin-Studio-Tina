@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import React from 'react'
 import styles from './productcollection.module.scss'
 import { useAuth } from '@/hooks/use-auth'
+import Link from 'next/link'
 
 export default function ProductCard() {
   const { auth } = useAuth()
@@ -67,53 +68,53 @@ export default function ProductCard() {
           <div
             className={`${styles['productcard']} ${isMobileButtonClicked ? styles['mobile-clicked'] : ''}`}
           >
-            <a href={`/products/${v.product_id}`}>
+            <Link href={`/products/${v.product_id}`}>
               <img
                 src={`/images/product_images/${v.img}`}
                 alt=""
                 className={styles['productcardimg']}
               />
-            </a>
+            </Link>
             <div className={styles['product-word']}>
               <ul className={`${styles.productcardtitle} list-unstyled`}>
                 <li className={styles['productbranding']}>
                   <a href={`/products/${v.product_id}`}>{v.brand}</a>
                 </li>
                 <li>
-                  <a
+                  <Link
                     className={styles['productname']}
                     href={`/products/${v.product_id}`}
                   >
                     {v.name}
-                  </a>
+                  </Link>
                 </li>
               </ul>
               <ul className={`${styles['productcard-function']} list-unstyled`}>
                 <li className={styles['productprice']}>{v.product_price}</li>
-                <a
+                <Link
                   className={styles['icon-mobile']}
                   href="#"
                   onClick={handleMobileButtonClick}
                 >
                   <img src="/icons/icon-chevron-right.svg" alt="手機版" />
-                </a>
+                </Link>
                 <div className={styles['productcardicons']}>
-                  <a href="">
+                  <Link href="">
                     <img src="/icons/icon-cart.svg" alt="購物車" />
-                  </a>
-                  <a href="">
+                  </Link>
+                  <Link href="">
                     <img src="/icons/icon-liked.svg" alt="收藏" />
-                  </a>
+                  </Link>
                 </div>
               </ul>
             </div>
             {isMobileButtonClicked && (
               <div className={`${styles['productcard-hidden']} `}>
                 <div className={styles['hiddenbtn']}>
-                  <a href="">加入購物車</a>
+                  <Link href="">加入購物車</Link>
                 </div>
                 <div className={styles['hiddenbtn']}>
-                  <a href="">刪除</a>
+                  <Link href="">刪除</Link>
                 </div>
               </div>
             )}

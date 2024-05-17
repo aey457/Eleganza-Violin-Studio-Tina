@@ -65,15 +65,12 @@ export default function ProductDetail({ comments }) {
     }
   }
   useEffect(() => {
-    // console.log('isReady', router.isReady, 'query', router.query)
     if (router.isReady) {
       getProduct(router.query.pid)
     }
   }, [router.isReady])
   const picsArr = product.pics.split(',')
   const introduction = product.introduction.replace(/,/g, '\n')
-  //   console.log(typeof recommendProduct) //object
-  //   console.log(recommendProduct)
   return (
     <>
       <div className="container">

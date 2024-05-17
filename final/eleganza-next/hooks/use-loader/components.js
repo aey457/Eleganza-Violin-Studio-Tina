@@ -5,7 +5,7 @@ import violinAnimation from '@/assets/violin-loader.json'
 export function ViolinLoader({ show = false }) {
   return (
     <>
-      {/* <div
+      <div
         className={`
     violin-loader-bg ${show ? '' : 'violin-loader--hide'}`}
       >
@@ -13,7 +13,7 @@ export function ViolinLoader({ show = false }) {
           className={`violin-loader ${show ? '' : 'violin-loader--hide'}`}
           animationData={violinAnimation}
         />
-      </div> */}
+      </div>
     </>
   )
 }

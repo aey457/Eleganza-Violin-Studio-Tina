@@ -24,6 +24,7 @@ export default function Products() {
       if (Array.isArray(data.data.products)) {
         setProducts(data.data.products)
         setFilterProduct(data.data.products)
+        setFilterProduct(data.data.products)
         //   console.log('success')
         //   console.log(products)
       } else {
@@ -52,6 +53,7 @@ export default function Products() {
         setProducts(data.data.products)
         setFilterProduct(data.data.products)
         setCheckboxStatus(false)
+        setPagination(0)
         setSelectedOption('預設排序')
 
         //   console.log('success')
@@ -223,6 +225,19 @@ export default function Products() {
     }
   }, [selectedOption])
 
+  // 分頁邏輯
+
+  const [pagination, setPagination] = useState(0)
+
+  // 共有幾頁
+  const pageCount = Math.ceil(filterProduct.length / 12)
+  //  console.log(pagination)
+  const handlePageClick = (page) => {
+    const currentPage = page * 12
+    setPagination(currentPage)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   return (
     <>
       <NavTop
@@ -256,7 +271,7 @@ export default function Products() {
           <div className="col col-md-9">
             <div className="row g-3 g-xl-4 row-cols-2 row-cols-sm-3 row-cols-xl-4">
               {filterProduct.map((product) => {
-                const { name, brand, product_price, img } = product
+                const { name, brand, product_price, img, product_id } = product
                 const productName = name.replace(brand, '')
                 //   console.log(productName)
 
@@ -268,13 +283,18 @@ export default function Products() {
                         brand={renderProductName(brand)}
                         price={product_price}
                         img={img}
+                        product_id={product_id}
                       />
                     </Link>
                   </div>
                 )
               })}
             </div>
-            <Pagination />
+            <Pagination
+              pageCount={pageCount}
+              handlePageClick={handlePageClick}
+              pagination={pagination}
+            />
           </div>
         </div>
       </div>

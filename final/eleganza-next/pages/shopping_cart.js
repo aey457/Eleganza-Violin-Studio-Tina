@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-// import { fetchCart } from '@/hooks/cartapi';
+import { fetchCart } from '@/hooks/cartapi';
 import ShoppingCart from '../component/shopping_cart/purchasepagecart';
 import Login from '../component/shopping_cart/login';
+import Eleganza from '../component/shopping_cart/eleganza';
 import axios from 'axios';
 
 const Index = () => {
@@ -49,7 +50,7 @@ const Index = () => {
   }
 
   if (isCartEmpty) {
-    return <div>您的購物車是空的。</div>;
+    return <Eleganza />;
   }
 
   return <ShoppingCart cartItems={cartItems} />;

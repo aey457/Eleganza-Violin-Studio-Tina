@@ -25,6 +25,7 @@ router.get('/:userId', async (req, res) => {
       FROM shopping_cart 
       LEFT JOIN product ON shopping_cart.product_id = product.product_id
       LEFT JOIN course ON shopping_cart.course_id = course.course_id
+      LEFT JOIN teacher ON course.teacher_id = teacher.teacher_id
       WHERE shopping_cart.user_id = :user_id
       `,
       {
@@ -35,11 +36,11 @@ router.get('/:userId', async (req, res) => {
 
     const total = cartItems.reduce((acc, item) => {
       const itemPrice = item.product_price || item.course_price || 0
-      console.log('商品價格:', itemPrice, '數量:', item.quantity)
+      // console.log('商品價格:', itemPrice, '數量:', item.quantity)
       return acc + itemPrice * item.quantity
     }, 0)
 
-    console.log('購物車總金額:', total)
+    // console.log('購物車總金額:', total)
 
     res.json({ status: 'success', data: { cartItems, total } })
   } catch (error) {
@@ -100,7 +101,25 @@ router.post('/decrease/:shopping_cart_id', async (req, res) => {
         .json({ status: 'fail', message: '購物車中未找到該商品' })
     }
 
-    const newQuantity = cartItem[0].quantity - 1
+    let newQuantity = cartItem[0].quantity - 1
+
+    // 如果商品數量小於等於 0，則刪除該商品
+    if (newQuantity <= 0) {
+      await sequelize.query(
+        `
+        DELETE FROM shopping_cart
+        WHERE shopping_cart_id = :shopping_cart_id
+        `,
+        {
+          replacements: { shopping_cart_id },
+          type: QueryTypes.DELETE,
+        }
+      )
+
+      console.log('成功刪除購物車商品')
+
+      return res.json({ status: 'success' })
+    }
 
     await sequelize.query(
       `
@@ -120,6 +139,130 @@ router.post('/decrease/:shopping_cart_id', async (req, res) => {
   } catch (error) {
     console.error('減少購物車中商品時出錯:', error)
     res.status(500).json({ status: 'error', message: '減少購物車中商品時出錯' })
+  }
+})
+
+router.post('/add', async (req, res) => {
+  const { user_id, product_id, course_id } = req.body
+
+  try {
+    // 檢查使用者是否存在
+    const userExists = await sequelize.query(
+      `
+      SELECT * 
+      FROM users 
+      WHERE user_id = :user_id
+      `,
+      {
+        replacements: { user_id },
+        type: QueryTypes.SELECT,
+      }
+    )
+
+    // 如果使用者不存在，回傳錯誤
+    if (userExists.length === 0) {
+      console.error('使用者不存在:', user_id)
+      return res.status(404).json({ status: 'fail', message: '使用者不存在' })
+    }
+
+    // 檢查商品或課程是否存在
+    let itemExists = false
+    let itemPrice = 0
+    let itemType = ''
+    let itemId = ''
+
+    if (product_id) {
+      const product = await sequelize.query(
+        `
+        SELECT * 
+        FROM product 
+        WHERE product_id = :product_id
+        `,
+        {
+          replacements: { product_id },
+          type: QueryTypes.SELECT,
+        }
+      )
+
+      if (product.length === 0) {
+        console.error('商品不存在:', product_id)
+        return res.status(404).json({ status: 'fail', message: '商品不存在' })
+      }
+
+      itemExists = true
+      itemPrice = product[0].product_price
+      itemType = 'product'
+      itemId = product_id
+    } else if (course_id) {
+      const course = await sequelize.query(
+        `
+        SELECT * 
+        FROM course 
+        WHERE course_id = :course_id
+        `,
+        {
+          replacements: { course_id },
+          type: QueryTypes.SELECT,
+        }
+      )
+
+      if (course.length === 0) {
+        console.error('課程不存在:', course_id)
+        return res.status(404).json({ status: 'fail', message: '課程不存在' })
+      }
+
+      itemExists = true
+      itemPrice = course[0].course_price
+      itemType = 'course'
+      itemId = course_id
+    }
+
+    if (!itemExists) {
+      console.error('未指定商品或課程')
+      return res
+        .status(400)
+        .json({ status: 'fail', message: '未指定商品或課程' })
+    }
+
+    // 檢查購物車中是否已存在相同商品
+    const existingItem = await sequelize.query(
+      `
+      SELECT * 
+      FROM shopping_cart 
+      WHERE user_id = :user_id 
+      AND ${product_id ? 'product_id' : 'course_id'} = :item_id
+      `,
+      {
+        replacements: { user_id, item_id: itemId },
+        type: QueryTypes.SELECT,
+      }
+    )
+
+    if (existingItem.length > 0) {
+      // 如果購物車中已存在相同商品，回傳錯誤
+      return res
+        .status(400)
+        .json({ status: 'fail', message: '該商品已經在購物車中了' })
+    }
+
+    // 將商品ID或課程ID新增到購物車,並設定數量為 1
+    await sequelize.query(
+      `
+      INSERT INTO shopping_cart (user_id, ${itemType}_id, quantity)
+      VALUES (:user_id, :item_id, 1)
+      `,
+      {
+        replacements: { user_id, item_id: itemId },
+        type: QueryTypes.INSERT,
+      }
+    )
+
+    console.log('成功新增購物車項目')
+
+    res.json({ status: 'success', message: '新增購物車商品成功' })
+  } catch (error) {
+    console.error('新增購物車項目時出錯:', error)
+    res.status(500).json({ status: 'error', message: '新增購物車項目時出錯' })
   }
 })
 

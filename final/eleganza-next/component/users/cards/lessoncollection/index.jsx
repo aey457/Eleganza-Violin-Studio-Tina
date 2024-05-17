@@ -55,6 +55,30 @@ export default function LessonCollectionCard() {
     getLessons()
   }, [])
 
+  // 當lessons為空時顯示空白狀態
+  if (lessons.length === 0) {
+    return (
+      <>
+        <div className={styles['mainarea-desktop-collection-empty']}>
+          <div className={styles['emptycontent-empty']}>
+            <p>您還未收藏任何課程</p>
+          </div>
+          <div className={styles['sbtn-empty']}>
+            <Link href="/course">前往購買</Link>
+          </div>
+        </div>
+        <div className={styles['lesson-mobile-empty']}>
+          <div className={styles['emptycontent-empty']}>
+            <p>您還未收藏任何課程</p>
+          </div>
+          <div className={styles['sbtn-empty']}>
+            <Link href="/course">前往購物</Link>
+          </div>
+        </div>
+      </>
+    )
+  }
+  
   return (
     <>
       {lessons.map((v, i) => (
@@ -70,7 +94,7 @@ export default function LessonCollectionCard() {
             <div className={styles['product-word']}>
               <ul className={`${styles.productcardtitle} list-unstyled`}>
                 <li className={styles['productbranding']}>
-                  <a href={`/course/${v.course_id}`}>2024/11/4</a>
+                  <Link href={`/course/${v.course_id}`}>{v.start_date}</Link>
                 </li>
                 <li>
                   <Link
@@ -85,10 +109,10 @@ export default function LessonCollectionCard() {
                     {v.course_teacher_name} 教師
                   </Link>
                 </li>
-                <li className={styles['lessontime']}>18:00~20:00</li>
+                <li className={styles['lessontime']}>{v.start_time}</li>
               </ul>
               <ul className={`${styles['productcard-function']} list-unstyled`}>
-                <li className={styles['productprice']}>{v.course_price}</li>
+                <li className={styles['productprice']}>$ {v.course_price}</li>
                 <div className={styles['productcardicons']}>
                   <Link href="/shopping_cart">
                     <img src="/icons/icon-cart.svg" alt="購物車" />
@@ -123,10 +147,10 @@ export default function LessonCollectionCard() {
                     {v.course_teacher_name} 教師
                   </Link>
                 </li>
-                <li className={styles['lessontime']}>18:00~20:00, 2024/11/4</li>
+                <li className={styles['lessontime']}>{v.start_time} , {v.start_date}</li>
               </ul>
               <ul className={`${styles['productcard-function']} list-unstyled`}>
-                <li className={styles['productprice']}>{v.course_price}</li>
+                <li className={styles['productprice']}>$ {v.course_price}</li>
                 <div className={styles['productcardicons']}>
                   <Link href="/shopping-cart">
                     <img src="/icons/icon-cart.svg" alt="購物車" />

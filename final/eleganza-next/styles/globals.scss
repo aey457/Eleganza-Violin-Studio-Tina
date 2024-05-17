@@ -25,7 +25,7 @@
   --color-primary-sdark:#ddddddd;
 
   --color-primary-medium: #9c9191;
-  --color-primary-light: #e2dede;
+  --color-primary-light: #e2dede !important;
   --color-secondary-dark: #322826;
   --color-secondary-medium: #85645d;
   --color-secondary-light: #c7a9a3;
@@ -47,7 +47,7 @@ body {
   // 字體
   font-family: var(--font-inter), var(--font-noto-sans), var(--font-noto-serif);
   /* 背景色、高度 */
-  background-color: var(--color-primary-light);
+  background-color: var(--color-primary-light)  !important;
   //   min-height: 100vh;
 
   /* 防止與內容與header重疊 */

@@ -17,10 +17,17 @@
     },
     "import/resolver": {
       "alias": {
-        "map": [
-          ["@", "."]
-        ],
-        "extensions": [".js", ".jsx", ".ts", ".tsx", ".css", ".module.css", ".scss", ".json"]
+        "map": [["@", "."]],
+        "extensions": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx",
+          ".css",
+          ".module.css",
+          ".scss",
+          ".json"
+        ]
       }
     }
   },
@@ -31,9 +38,7 @@
     "plugin:jsx-a11y/recommended",
     "plugin:import/errors",
     "next",
-    "next/core-web-vitals",
-    "prettier",
-    "next/core-web-vitals"
+    "prettier"
   ],
   "plugins": ["jsx-a11y", "react", "react-hooks", "prettier"],
   "rules": {

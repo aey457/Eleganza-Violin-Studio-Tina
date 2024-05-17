@@ -12,53 +12,42 @@ export default function SideNav() {
   const [user, setUser] = useState({})
   const router = useRouter()
   const { auth } = useAuth()
-  const [hasLesson, setHasLesson] = useState(false)
-  const [hasLessonCollection, setHasLessonCollection] = useState(false)
+  const [isSubMenuOpen, setIsSubMenuOpen] = useState(false)
+
+  const handleMainPageClick = (page) => {
+    setCurrentPage(page)
+    setIsSubMenuOpen(!isSubMenuOpen)
+  }
+
+  const fetchUserDetails = async (userId) => {
+    const accessToken = localStorage.getItem('accessToken')
+    if (!accessToken) return
+
+    try {
+      const response = await fetch(
+        `http://localhost:3005/api/home-myaccount/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      )
+      if (!response.ok) throw new Error('Failed to fetch user details')
+      const data = await response.json()
+      setUser(data.userDetails)
+    } catch (error) {
+      console.error('Error fetching user details:', error)
+      // 在這裡處理錯誤，例如顯示一個錯誤提示給用戶
+    }
+  }
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const accessToken = localStorage.getItem('accessToken')
-        if (!accessToken) {
-          // 如果 localStorage 中沒有 accessToken，則不執行後續操作
-          return
-        }
-        const parseJwt = (token) => {
-          const base64Payload = token.split('.')[1]
-          const payload = Buffer.from(base64Payload, 'base64')
-          return JSON.parse(payload.toString())
-        }
-
-        // 解析 JWT 並提取 userData
-        const userData = parseJwt(accessToken)
-        setUser(userData) // 更新使用者資料狀態
-        console.log(userData)
-
-        // 檢查是否有課程
-        const res = await fetch(
-          `http://localhost:3005/api/my-lessoncollection/lessonorder/${userData.id}`,
-        )
-        const data = await res.json()
-        console.log(data)
-        setHasLesson(Array.isArray(data) && data.length > 0)
-
-        // 檢查是否有課程收藏
-        const lessonCollectionRes = await fetch(
-          `http://localhost:3005/api/my-lessoncollection/lessoncollection/${userData.id}`,
-        )
-        const lessonCollectionData = await lessonCollectionRes.json()
-        setHasLessonCollection(
-          Array.isArray(lessonCollectionData) &&
-            lessonCollectionData.length > 0,
-        )
-      } catch (error) {
-        console.error('Error fetching user details:', error)
-      }
+    const userId = auth?.userData?.id // 或者任何你想要的使用者ID
+    if (userId) {
+      fetchUserDetails(userId)
     }
+  }, [auth])
 
-    fetchUserData() // 執行取得使用者資料的函式
-  }, [])
-  console.log(hasLesson)
   const toggleSideNav = () => {
     setIsSideNavVisible(!isSideNavVisible)
   }
@@ -77,7 +66,7 @@ export default function SideNav() {
         <ul className={`list-unstyled ${styles['accountform']}`}>
           <li>
             <Link
-              href="/users/account-center/account-center?userId="
+              href="/users/account-center/account-center"
               onClick={() => setCurrentPage('我的帳號')}
               className={
                 currentPage === '我的帳號' ? styles['sidenavselected'] : ''
@@ -88,11 +77,7 @@ export default function SideNav() {
           </li>
           <li>
             <Link
-              href={
-                hasLesson
-                  ? '/users/empty/orderhistory-empty-l'
-                  : '/users/mobile-cardlayout/my-lesson'
-              }
+              href="/users/mobile-cardlayout/my-lesson"
               onClick={() => setCurrentPage('我的課程')}
               className={
                 currentPage === '我的課程' ? styles['sidenavselected'] : ''
@@ -104,43 +89,31 @@ export default function SideNav() {
           <li>
             <Link
               href="#"
-              onClick={() => setCurrentPage('收藏內容')}
-              className={
-                currentPage === '收藏內容' ? styles['sidenavselected'] : ''
-              }
+              onClick={() => handleMainPageClick('收藏內容')}
+              className={currentPage === '收藏內容' ? styles.sidenavselected : ''}
             >
               收藏內容
             </Link>
-            <ul className={styles['sidenavsub-desktop']}>
-              <li
-                className={
-                  currentSubPage === '商品收藏' ? styles['current'] : ''
-                }
-              >
-                <Link
-                  href="/users/mobile-cardlayout/product-collection"
-                  onClick={() => setCurrentSubPage('商品收藏')}
-                >
-                  商品收藏
-                </Link>
-              </li>
-              <li
-                className={
-                  currentSubPage === '課程收藏' ? styles['current'] : ''
-                }
-              >
-                <Link
-                  href={
-                    hasLessonCollection
-                      ? '/users/empty/collection-empty-l'
-                      : '/users/mobile-cardlayout/lesson-collection'
-                  }
-                  onClick={() => setCurrentSubPage('課程收藏')}
-                >
-                  課程收藏
-                </Link>
-              </li>
-            </ul>
+            {isSubMenuOpen && (
+              <ul className={styles['sidenavsub-desktop']}>
+                <li className={currentSubPage === '商品收藏' ? styles.current : ''}>
+                  <Link
+                    href="/users/mobile-cardlayout/product-collection"
+                    onClick={() => setCurrentSubPage('商品收藏')}
+                  >
+                    商品收藏
+                  </Link>
+                </li>
+                <li className={currentSubPage === '課程收藏' ? styles.current : ''}>
+                  <Link
+                    href="/users/mobile-cardlayout/lesson-collection"
+                    onClick={() => setCurrentSubPage('課程收藏')}
+                  >
+                    課程收藏
+                  </Link>
+                </li>
+              </ul>
+            )}
           </li>
           <li>
             <Link
@@ -191,11 +164,7 @@ export default function SideNav() {
           </li>
           <li>
             <Link
-              href={
-                hasLesson
-                  ? '/users/mobile-cardlayout/my-lesson'
-                  : '/users/empty/orderhistory-empty-l'
-              }
+              href="/users/mobile-cardlayout/my-lesson"
               onClick={() => setCurrentPage('我的課程')}
               className={
                 currentPage === '我的課程' ? styles['sidenavselected'] : ''
@@ -208,40 +177,32 @@ export default function SideNav() {
           <li>
             <Link
               href="#"
-              onClick={() => setCurrentPage('收藏內容')}
-              className={
-                currentPage === '收藏內容' ? styles['sidenavselected'] : ''
-              }
+              onClick={() => handleMainPageClick('收藏內容')}
+              className={currentPage === '收藏內容' ? styles.sidenavselected : ''}
             >
               收藏內容
               <img src="/icons/icon-chevron-right.svg" alt="" />
             </Link>
-            <ul className={styles['sidenavsub-mobile']}>
-              <li
-                className={
-                  currentSubPage === '商品收藏' ? styles['current'] : ''
-                }
-              >
-                <Link
-                  href="/users/mobile-cardlayout/product-collection"
-                  onClick={() => setCurrentSubPage('商品收藏')}
-                >
-                  商品收藏
-                </Link>
-              </li>
-              <li
-                className={
-                  currentSubPage === '課程收藏' ? styles['current'] : ''
-                }
-              >
-                <Link
-                  href="/users/mobile-cardlayout/lesson-collection"
-                  onClick={() => setCurrentSubPage('課程收藏')}
-                >
-                  課程收藏
-                </Link>
-              </li>
-            </ul>
+            {isSubMenuOpen && (
+              <ul className={styles['sidenavsub-mobile']}>
+                <li className={currentSubPage === '商品收藏' ? styles.current : ''}>
+                  <Link
+                    href="/users/mobile-cardlayout/product-collection"
+                    onClick={() => setCurrentSubPage('商品收藏')}
+                  >
+                    商品收藏
+                  </Link>
+                </li>
+                <li className={currentSubPage === '課程收藏' ? styles.current : ''}>
+                  <Link
+                    href="/users/mobile-cardlayout/lesson-collection"
+                    onClick={() => setCurrentSubPage('課程收藏')}
+                  >
+                    課程收藏
+                  </Link>
+                </li>
+              </ul>
+            )}
           </li>
           <li>
             <Link

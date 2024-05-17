@@ -1,8 +1,20 @@
 import React from 'react'
 import styles from './product-card.module.scss'
+import useAddToCart from '@/hooks/useAddToCart'
 
-export default function ProductCard({ img, price, name, brand }) {
+export default function ProductCard({ product_id, img, price, name, brand}) {
   // 品牌只顯示一次
+  const { addToCart } = useAddToCart()
+
+  console.log('product_id:', product_id)
+
+  const handleAddToCart = () => {
+    if (product_id) {
+      addToCart({ id: product_id, type: 'product' })
+    } else {
+      console.error('未找到對應的 product_id')
+    }
+  }
 
   return (
     <>
@@ -38,6 +50,7 @@ export default function ProductCard({ img, price, name, brand }) {
                   className={`${styles['cart']}`}
                   src="/icons/icon-cart.svg"
                   alt=""
+                  onClick={()=>handleAddToCart()}
                 />
               </div>
             </div>

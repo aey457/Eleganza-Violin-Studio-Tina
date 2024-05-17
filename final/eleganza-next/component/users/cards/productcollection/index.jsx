@@ -6,6 +6,11 @@ import Link from 'next/link'
 
 export default function ProductCard() {
   const { auth } = useAuth()
+  const [isMobileButtonClicked, setIsMobileButtonClicked] = useState(false)
+
+  const handleMobileButtonClick = () => {
+    setIsMobileButtonClicked(!isMobileButtonClicked)
+  }
   const [productDetails, setProductDetails] = useState(null)
 
   useEffect(() => {
@@ -55,10 +60,27 @@ export default function ProductCard() {
     getProducts()
   }, [])
 
-  const [isMobileButtonClicked, setIsMobileButtonClicked] = useState(false)
-
-  const handleMobileButtonClick = () => {
-    setIsMobileButtonClicked(!isMobileButtonClicked)
+  if (products.length === 0) {
+    return (
+      <>
+        <div className={styles['mainarea-desktop-collection-empty']}>
+          <div className={styles['emptycontent-empty']}>
+            <p>您還未收藏任何商品</p>
+          </div>
+          <div className={styles['sbtn-empty']}>
+            <Link href="/products">前往購買</Link>
+          </div>
+        </div>
+        <div className={styles['lesson-mobile-empty']}>
+          <div className={styles['emptycontent-empty']}>
+            <p>您還未收藏任何商品</p>
+          </div>
+          <div className={styles['sbtn-empty']}>
+            <Link href="/products">前往購買</Link>
+          </div>
+        </div>
+      </>
+    )
   }
 
   return (
@@ -78,7 +100,7 @@ export default function ProductCard() {
             <div className={styles['product-word']}>
               <ul className={`${styles.productcardtitle} list-unstyled`}>
                 <li className={styles['productbranding']}>
-                  <a href={`/products/${v.product_id}`}>{v.brand}</a>
+                  <Link href={`/products/${v.product_id}`}>{v.brand}</Link>
                 </li>
                 <li>
                   <Link
@@ -90,7 +112,7 @@ export default function ProductCard() {
                 </li>
               </ul>
               <ul className={`${styles['productcard-function']} list-unstyled`}>
-                <li className={styles['productprice']}>{v.product_price}</li>
+                <li className={styles['productprice']}>$ {v.product_price}</li>
                 <Link
                   className={styles['icon-mobile']}
                   href="#"

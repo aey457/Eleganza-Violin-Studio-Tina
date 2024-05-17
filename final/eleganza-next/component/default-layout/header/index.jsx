@@ -41,14 +41,14 @@ export default function Header() {
           </div>
 
           <div
-            className={
-              styles['header-icons'] +
-              ' d-flex align-items-center justify-content-between'
-            }
+            className={`${styles['header-icons']} 
+               d-flex align-items-center justify-content-between`}
           >
-            <a href="">
-              <img className={styles.cart} src="/icons/icon-cart-white.svg" />
-            </a>
+            <div href="" className="d-none d-xl-block">
+              <Link href="/shopping_cart">
+                <img className={styles.cart} src="/icons/icon-cart-white.svg" />
+              </Link>
+            </div>
 
             <Link
               href={

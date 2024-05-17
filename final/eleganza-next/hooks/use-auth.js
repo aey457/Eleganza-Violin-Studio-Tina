@@ -11,24 +11,35 @@ export function AuthProvider({ children }) {
     const payload = Buffer.from(base64Payload, 'base64')
     return JSON.parse(payload.toString())
   }
+
   const [auth, setAuth] = useState({
     isAuth: false,
     userData: null,
     token: null,
     isLoggedIn: false,
+    userId: null,
   })
   const router = useRouter()
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    const userData = JSON.parse(localStorage.getItem('userData') || '{}')
+    const token = localStorage.getItem('accessToken')
+    let userData = null
+
+    // 檢查是否有存儲的用戶數據
+    const storedUserData = localStorage.getItem('user')
+    if (storedUserData) {
+      userData = JSON.parse(storedUserData)
+      console.log(storedUserData)
+    }
 
     if (token) {
+      const parsedData = parseJwt(token)
       setAuth({
         token: token,
         isLoggedIn: true,
-        userData: userData,
+        userData: parsedData,
         isAuth: true,
+        userId: parsedData.id,
       })
     }
   }, [])
@@ -69,14 +80,16 @@ export function AuthProvider({ children }) {
         localStorage.setItem('userId', data.data.userId)
 
         // 更新用户认证状态和数据
+        const parsedData = parseJwt(data.data.accessToken)
         setAuth({
           token: data.data.accessToken,
           isLoggedIn: true,
-          userData: parseJwt(data.data.accessToken),
+          userData: parsedData,
           isAuth: true,
+          userId: parsedData.id,
         })
 
-        console.log(parseJwt(data.data.accessToken))
+        console.log(parsedData)
 
         router.push('/users/account-center/account-center')
         alert('登入成功')
@@ -113,6 +126,7 @@ export function AuthProvider({ children }) {
         isLoggedIn: false,
         userData: null,
         isAuth: false,
+        userId: null,
       })
       router.push(`/`)
       alert('登出成功')

@@ -1,14 +1,27 @@
 .course-details-container {
-    display: flex; /* 使用Flexbox排版 */
-    /* justify-content: space-between; */
-    margin-bottom: 60px;
-}
-.grid-item-left {
-    flex-grow: 1; /* 左列自動填滿剩餘空間 */
-    display: flex;
-    flex-direction: column;
+  display: flex; // 使用 Flexbox 排版
+  align-items: flex-start; // 确保左侧栏的图片与右侧栏的内容对齐
+  margin-bottom: 60px;
 }
 
-.grid-item-right {
-    flex-grow: 1; /* 右列自動填滿剩餘空間 */
+.back-button {
+  position: absolute; // 绝对定位
+  top: 20px; // 距离顶部 20px
+  left: 20px; // 距离左侧 20px
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  font-size: 1em;
+  color: #322826;
+
+  img {
+    margin-right: 10px;
+  }
+
+  &:hover {
+    color: #211c1a;
+  }
 }

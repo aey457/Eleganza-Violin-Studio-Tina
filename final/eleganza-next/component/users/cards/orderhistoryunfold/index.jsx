@@ -156,6 +156,29 @@ export default function OrderHistoryUnfoldCard() {
     setIsDetailOpen(!isDetailOpen)
   }
 
+  if (lessons.length === 0 && products.length === 0) {
+    return (
+      <>
+        <div className={styles['mainarea-desktop-collection-empty']}>
+          <div className={styles['emptycontent-empty']}>
+            <p>您尚未有任何商品的購買紀錄</p>
+          </div>
+          <div className={styles['sbtn-empty']}>
+            <Link href="/products">前往購買</Link>
+          </div>
+        </div>
+        <div className={styles['lesson-mobile-empty']}>
+          <div className={styles['emptycontent-empty']}>
+            <p>您尚未有任何商品的購買紀錄</p>
+          </div>
+          <div className={styles['sbtn-empty']}>
+            <Link href="/products">前往購物</Link>
+          </div>
+        </div>
+      </>
+    )
+  }
+
   return (
     <>
       {orders.map((order, orderIndex) => (
@@ -166,7 +189,7 @@ export default function OrderHistoryUnfoldCard() {
           >
             <p>{order.order_id}</p>
             <p>{order.order_date}</p>
-            <p>${order.total_price}</p>
+            <p>$ {order.total_price}</p>
             <p>{order.status}</p>
             <div className={`${styles['checkdetail']}`}>
               <p style={{ margin: 0 }}>查看詳情</p>
@@ -237,7 +260,7 @@ export default function OrderHistoryUnfoldCard() {
                             </Link>
                           </div>
                           <div className={styles.orderprice}>
-                            <p>{item.product_price || item.course_price}</p>
+                            <p>$ {item.product_price || item.course_price}</p>
                             <div className={styles.orderquantity}>
                               <img src="/icons/icon-x.svg" alt="" />
                               <p>
@@ -273,7 +296,7 @@ export default function OrderHistoryUnfoldCard() {
               </div>
               <div className={`${styles['mobiletotal']} `}>
                 <p>總計</p>
-                <p>${order.total_price}</p>
+                <p>$ {order.total_price}</p>
               </div>
             </div>
           )}

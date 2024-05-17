@@ -54,6 +54,30 @@ export default function LessonCard() {
     getLessons()
   }, [])
 
+  // 當lessons為空時顯示空白狀態
+  if (lessons.length === 0) {
+    return (
+      <>
+        <div className={styles['mainarea-desktop-collection-empty']}>
+          <div className={styles['emptycontent-empty']}>
+            <p>您尚未有任何課程</p>
+          </div>
+          <div className={styles['sbtn-empty']}>
+            <Link href="/course">前往購買</Link>
+          </div>
+        </div>
+        <div className={styles['lesson-mobile-empty']}>
+          <div className={styles['emptycontent-empty']}>
+            <p>您尚未有任何課程</p>
+          </div>
+          <div className={styles['sbtn-empty']}>
+            <Link href="/course">前往購買</Link>
+          </div>
+        </div>
+      </>
+    )
+  }
+
   return (
     <>
       {lessons.map((v, i) => (

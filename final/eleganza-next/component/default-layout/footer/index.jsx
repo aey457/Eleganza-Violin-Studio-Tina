@@ -1,5 +1,6 @@
 import React from 'react'
 import styles from './footer.module.scss'
+import Link from 'next/link'
 
 export default function Footer() {
   return (
@@ -49,8 +50,10 @@ export default function Footer() {
                   <div className={`${styles.link} col-sm  mb-2`}>
                     <span className={`${styles.title}`}>聯繫方式</span>
                     <span>
+                      <Link href={`mailto:eleganza@gmail.com`}>
                       <img src="/icons/icon-mail-white.svg" />{' '}
                       eleganza@gmail.com
+                      </Link>
                     </span>
                     <span>
                       <img src="/icons/icon-phone-white.svg" />

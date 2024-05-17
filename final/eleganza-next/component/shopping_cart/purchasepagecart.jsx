@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import classNames from 'classnames'
 import animation from './CSS/animation.module.css'
 import pageCart from './CSS/page_cart.module.css'
 import pageCheckOut from './CSS/page_check_out.module.css'
 import pageComplete from './CSS/page_complete.module.css'
+import { useState, useEffect } from 'react';
+import classNames from 'classnames'
 import axios from 'axios';
 import { useRouter } from 'next/router';
 
@@ -47,6 +47,10 @@ const ShoppingCart = () => {
     const nameInput = document.querySelector('input[aria-label="姓名"]');
     const selectedPaymentMethod = document.getElementById('payment-method').value;
     const selectedShippingMethod = document.getElementById('shipping-method').value;
+    const cardNumberInput = document.querySelector('input[aria-label="Card number"]');
+    const expiryInput = document.querySelector('input[aria-label="Expiration date(MM/YY)"]');
+    const cvvInput = document.querySelector('input[aria-label="Security code"]');
+
 
     // 檢查選擇的寄送方式是否為預設值
     if (selectedShippingMethod === 'shipping-method') {
@@ -81,6 +85,23 @@ const ShoppingCart = () => {
     // 檢查電話號碼是否為空並且是否符合格式
     if (!telInput.value || !telInput.validity.valid) {
       alert('請輸入有效的電話號碼（10位數字）');
+      return;
+    }
+
+    if (!cardNumberInput.value.trim() || !cardNumberInput.validity.valid) {
+      alert('請輸入13至16位數字的信用卡號');
+      return;
+    }
+
+    // 檢查有效期限是否為空並且格式正確
+    if (!expiryInput.value.trim() || !expiryInput.validity.valid) {
+      alert('請輸入有效的有效期限，格式為 MM/YY');
+      return;
+    }
+
+    // 檢查安全碼是否為空並且格式正確
+    if (!cvvInput.value.trim() || !cvvInput.validity.valid) {
+      alert('請輸入3至4位數字的安全碼');
       return;
     }
 
@@ -284,12 +305,12 @@ const ShoppingCart = () => {
                   />
                   {/* src={`@/public/images/product_images/${item.product_img || `@/public/images/course_images/${item.course_img`} */}
                   <section className={pageCart['product-info']}>
-                    <h2>
+                    <p className={pageCart['product-name']}>
                       {item.name || item.course_name}{' '}
                       {/* 顯示商品或課程名稱 */}
-                    </h2>
+                    </p>
                     {item.course_name && (
-                      <p>{item.teacher_name} 教師</p>
+                      <p>{item.t_name} 教師</p>
                     )}
                   </section>
                   <div className={pageCart['quantity-selector']}>
@@ -323,15 +344,15 @@ const ShoppingCart = () => {
             ))}
 
             {/* 購物車總結信息 */}
-            <div className={pageCart.cart} id="cart">
-              <section className={pageCart.cartSummary}>
-                <h2 className={pageCart.cartSummary}>共{itemCount}項商品</h2>
-                <div className={pageCart.subtotalContainer}>
-                  <span>小計</span>
-                  <span>${total}</span> {/* 顯示購物車總金額 */}
+            <div className={pageCart['cart']} id="cart">
+              <section className={pageCart['cart-summary']}>
+                <h2 className={pageCart['cart-item-count']}>共{itemCount}項商品</h2>
+                <div className={pageCart['ubtotal-container']}>
+                  <span className={pageCart['subtotal-label']}>小計</span>
+                  <span className={pageCart['subtotal-amount']}>${total}</span> {/* 顯示購物車總金額 */}
                 </div>
                 <button
-                  className={pageCart.checkoutButton}
+                  className={pageCart['checkout-button']}
                   onClick={handleButtonClick}
                 >
                   前往付款
@@ -464,19 +485,29 @@ const ShoppingCart = () => {
                     className={`${pageCheckOut['card-number-input']}`}
                     placeholder="信用卡號"
                     aria-label="Card number"
+                    pattern="[0-9]{13,16}"
+                    title="請輸入13至16位數字的信用卡號"
+                    required
                   />
+
                   <div className={`${pageCheckOut['expiry-cvv-container']}`}>
                     <input
                       type="text"
                       className={`${pageCheckOut['expiry-input']}`}
-                      placeholder="有效期限(年/月)"
+                      placeholder="有效期限(月/年)"
                       aria-label="Expiration date(MM/YY)"
+                      pattern="(0[1-9]|1[0-2])\/[0-9]{2}"
+                      title="請輸入有效的有效期限，格式為 MM/YY"
+                      required
                     />
                     <input
                       type="text"
                       className={`${pageCheckOut['cvv-input']}`}
                       placeholder="安全碼"
                       aria-label="Security code"
+                      pattern="[0-9]{3,4}"
+                      title="請輸入3至4位數字的安全碼"
+                      required
                     />
                   </div>
                   <input
@@ -498,13 +529,16 @@ const ShoppingCart = () => {
                     <input
                       type="checkbox"
                       id="same-as-shipping"
+                      style={{ display: selectedShippingMethod === "home_delivery" ? "block" : "none" }}
                       onChange={handleCheckboxChange}
                       checked={!isBillingAddressVisible}
                     />
 
-                    <label htmlFor="same-as-shipping">
-                      帳單地址與送貨地址相同
-                    </label>
+                    {selectedShippingMethod === "home_delivery" && (
+                      <label htmlFor="same-as-shipping">
+                        帳單地址與送貨地址相同
+                      </label>
+                    )}
                   </div>
                 </div>
               )}
@@ -556,10 +590,10 @@ const ShoppingCart = () => {
                     </div>
                     <div className={pageCheckOut['product-details']}>
                       <div className={pageCheckOut['product-info']}>
-                        <h2>
+                        <div className={pageCheckOut['product-brand']}>
                           {item.name || item.course_name}{' '}
                           {/* 顯示商品或課程名稱 */}
-                        </h2>
+                        </div>
                         {item.name || item.course_name}
                         {/* 只有在讀取 course_name 時顯示教師名稱 */}
                       </div>

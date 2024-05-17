@@ -23,6 +23,10 @@
   display: inline-block;
 }
 
+.violin-loader--hide {
+  display: none;
+}
+
 // 手機用大小和位置
 @media screen and (max-device-width: 480px) {
   .violin-loader {

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Head from 'next/head'
 import styles from './mobile-cardlayout.module.css'
-import emptyStyles from '../empty/empty.module.css'
 import LessonCollectionCard from '@/component/users/cards/lessoncollection/'
 import UserLayout from '@/component/users/user-layout'
 import Link from 'next/link'

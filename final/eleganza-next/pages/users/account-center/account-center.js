@@ -33,15 +33,6 @@ export default function AccountCenter() {
     }
   }
 
-  // const [user, setUser] = useState({
-  //   user_email: '',
-  //   user_password: '',
-  //   user_phone: '',
-  //   user_name: '',
-  //   user_account: '',
-  //   newPassword: '',
-  //   newPasswordConfirm: '',
-  // })
   const [errors, setErrors] = useState({
     user_useremail: '',
     user_password: '',
@@ -92,6 +83,19 @@ export default function AccountCenter() {
     if (userDetails.newPassword && !userDetails.newPasswordConfirm) {
       newErrors.newPasswordConfirm = '*確認密碼為必填'
       hasErrors = true
+    }
+
+    const newPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()\-_=+{};:,<.>]{6,}$/;
+    if(!newPasswordRegex.test(userDetails.newPassword)) {
+      newErrors.newPassword = '新密碼必須至少6個字符，必須包含數字、羅馬字母大小寫，並可加入特殊符號';
+      hasErrors = true;
+    }
+
+    // 手機號碼格式檢查
+    const phoneRegex = /^09\d{8}$/;
+    if (!phoneRegex.test(userDetails.user_phone)) {
+      newErrors.user_phone = '手機號碼必須是以 09 開頭的 10 位阿拉伯數字';
+      hasErrors = true;
     }
 
     setErrors(newErrors)
@@ -152,9 +156,12 @@ export default function AccountCenter() {
                       type="text"
                       // placeholder={userDetails?.user_phone}
                       name="user_phone"
-                      value={userDetails?.user_phone}
+                      value={userDetails?.user_phone || ''}
+                      // value={userDetails?.user_phone}
                       onChange={handleFieldChange}
+                      required
                     />
+                    <span className={styles.error}>{errors.user_phone}</span>
                     <input
                       className={styles['formstyle']}
                       type="text"

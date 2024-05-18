@@ -85,17 +85,22 @@ export default function AccountCenter() {
       hasErrors = true
     }
 
-    const newPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()\-_=+{};:,<.>]{6,}$/;
-    if(!newPasswordRegex.test(userDetails.newPassword)) {
-      newErrors.newPassword = '新密碼必須至少6個字符，必須包含數字、羅馬字母大小寫，並可加入特殊符號';
-      hasErrors = true;
+    if (userDetails.newPassword) {
+      // 只有當 newPassowrd 欄位有更動時才進行密碼格式驗證
+      const newPasswordRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()\-_=+{};:,<.>]{6,}$/
+      if (!newPasswordRegex.test(userDetails.newPassword)) {
+        newErrors.newPassword =
+          '新密碼必須至少6個字符，必須包含數字、羅馬字母大小寫，並可加入特殊符號'
+        hasErrors = true
+      }
     }
 
     // 手機號碼格式檢查
-    const phoneRegex = /^09\d{8}$/;
+    const phoneRegex = /^09\d{8}$/
     if (!phoneRegex.test(userDetails.user_phone)) {
-      newErrors.user_phone = '手機號碼必須是以 09 開頭的 10 位阿拉伯數字';
-      hasErrors = true;
+      newErrors.user_phone = '手機號碼必須是以 09 開頭的 10 位阿拉伯數字'
+      hasErrors = true
     }
 
     setErrors(newErrors)
@@ -112,6 +117,10 @@ export default function AccountCenter() {
       user_password: userDetails.newPassword
         ? userDetails.newPassword
         : userDetails.user_password, // 可以根據需要修改成 user.new_Password
+    }
+
+    if (userDetails.newPassword) {
+      updatedUserData.user_password = userDetails.newPassword
     }
 
     updateUserData(updatedUserData)
@@ -267,6 +276,7 @@ export default function AccountCenter() {
                   value={userDetails?.user_phone}
                   onChange={handleFieldChange}
                 />
+                <span className={styles.error}>{errors.user_phone}</span>
                 <input
                   className={styles['formstyle']}
                   type="text"

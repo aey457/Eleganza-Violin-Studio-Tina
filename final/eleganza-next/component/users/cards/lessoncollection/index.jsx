@@ -3,6 +3,7 @@ import React from 'react'
 import styles from './lessoncollection.module.scss'
 import { useAuth } from '@/hooks/use-auth'
 import Link from 'next/link'
+import moment from 'moment-timezone';
 
 export default function LessonCollectionCard() {
   const [lessonDetails, setLessonDetails] = useState(null)
@@ -94,7 +95,7 @@ export default function LessonCollectionCard() {
             <div className={styles['product-word']}>
               <ul className={`${styles.productcardtitle} list-unstyled`}>
                 <li className={styles['productbranding']}>
-                  <Link href={`/course/${v.course_id}`}>{v.start_date}</Link>
+                  <Link href={`/course/${v.course_id}`}>{moment(v.start_date).tz('Asia/Taipei').format('YYYY-MM-DD')}</Link>
                 </li>
                 <li>
                   <Link
@@ -147,7 +148,7 @@ export default function LessonCollectionCard() {
                     {v.course_teacher_name} 教師
                   </Link>
                 </li>
-                <li className={styles['lessontime']}>{v.start_time} , {v.start_date}</li>
+                <li className={styles['lessontime']}>{v.start_time} , {moment(v.start_date).tz('Asia/Taipei').format('YYYY-MM-DD')}</li>
               </ul>
               <ul className={`${styles['productcard-function']} list-unstyled`}>
                 <li className={styles['productprice']}>$ {v.course_price}</li>

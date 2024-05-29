@@ -3,7 +3,7 @@ import React from 'react'
 import styles from './lessoncard.module.scss'
 import { useAuth } from '@/hooks/use-auth'
 import Link from 'next/link'
-import moment from 'moment-timezone';
+import moment from 'moment-timezone'
 
 export default function LessonCard() {
   const [lessonDetails, setLessonDetails] = useState(null)
@@ -93,7 +93,9 @@ export default function LessonCard() {
             </Link>
             <div className={styles['lessoncard-word']}>
               <ul className={`${styles.lessoncardtitle} list-unstyled`}>
-                <li className={styles['lessondate']}>{moment(v.start_date).tz('Asia/Taipei').format('YYYY-MM-DD')}</li>
+                <li className={styles['lessondate']}>
+                  {moment(v.start_date).tz('Asia/Taipei').format('YYYY-MM-DD')}
+                </li>
                 <li>
                   <Link
                     className={styles['lessonname']}

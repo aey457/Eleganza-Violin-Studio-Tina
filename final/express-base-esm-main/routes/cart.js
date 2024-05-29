@@ -143,7 +143,11 @@ router.post('/decrease/:shopping_cart_id', async (req, res) => {
 })
 
 router.post('/add', async (req, res) => {
-  const { user_id, product_id, course_id } = req.body
+  const { user_id, product_id, course_id, time } = req.body
+  // const { day, time: timeString } = time
+
+  // // 格式化 day 為 YYYY-MM-DD
+  // const formattedDay = new Date(day).toISOString().split('T')[0]
 
   try {
     // 檢查使用者是否存在
@@ -194,6 +198,11 @@ router.post('/add', async (req, res) => {
       itemType = 'product'
       itemId = product_id
     } else if (course_id) {
+      const { day, time: timeString } = time
+
+      // 格式化 day 為 YYYY-MM-DD
+      const formattedDay = new Date(day).toISOString().split('T')[0]
+
       const course = await sequelize.query(
         `
         SELECT * 
@@ -225,18 +234,46 @@ router.post('/add', async (req, res) => {
     }
 
     // 檢查購物車中是否已存在相同商品
-    const existingItem = await sequelize.query(
-      `
-      SELECT * 
-      FROM shopping_cart 
-      WHERE user_id = :user_id 
-      AND ${product_id ? 'product_id' : 'course_id'} = :item_id
-      `,
-      {
-        replacements: { user_id, item_id: itemId },
-        type: QueryTypes.SELECT,
-      }
-    )
+    let existingItem
+    if (product_id) {
+      existingItem = await sequelize.query(
+        `
+        SELECT * 
+        FROM shopping_cart 
+        WHERE user_id = :user_id 
+        AND product_id = :item_id
+        `,
+        {
+          replacements: { user_id, item_id: itemId },
+          type: QueryTypes.SELECT,
+        }
+      )
+    } else if (course_id) {
+      const { day, time: timeString } = time
+
+      // 格式化 day 為 YYYY-MM-DD
+      const formattedDay = new Date(day).toISOString().split('T')[0]
+
+      existingItem = await sequelize.query(
+        `
+        SELECT * 
+        FROM shopping_cart 
+        WHERE user_id = :user_id 
+        AND course_id = :item_id
+        AND day = :day
+        AND time = :time
+        `,
+        {
+          replacements: {
+            user_id,
+            item_id: itemId,
+            day: formattedDay,
+            time: timeString,
+          },
+          type: QueryTypes.SELECT,
+        }
+      )
+    }
 
     if (existingItem.length > 0) {
       // 如果購物車中已存在相同商品，回傳錯誤
@@ -246,16 +283,39 @@ router.post('/add', async (req, res) => {
     }
 
     // 將商品ID或課程ID新增到購物車,並設定數量為 1
-    await sequelize.query(
-      `
+    if (itemType === 'course') {
+      const { day, time: timeString } = time
+
+      // 格式化 day 為 YYYY-MM-DD
+      const formattedDay = new Date(day).toISOString().split('T')[0]
+
+      await sequelize.query(
+        `
+      INSERT INTO shopping_cart (user_id, ${itemType}_id, day, time, quantity)
+      VALUES (:user_id, :item_id, :day, :time, 1)
+      `,
+        {
+          replacements: {
+            user_id,
+            item_id: itemId,
+            day: formattedDay,
+            time: timeString,
+          },
+          type: QueryTypes.INSERT,
+        }
+      )
+    } else {
+      await sequelize.query(
+        `
       INSERT INTO shopping_cart (user_id, ${itemType}_id, quantity)
       VALUES (:user_id, :item_id, 1)
       `,
-      {
-        replacements: { user_id, item_id: itemId },
-        type: QueryTypes.INSERT,
-      }
-    )
+        {
+          replacements: { user_id, item_id: itemId },
+          type: QueryTypes.INSERT,
+        }
+      )
+    }
 
     console.log('成功新增購物車項目')
 

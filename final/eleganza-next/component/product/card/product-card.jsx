@@ -1,18 +1,30 @@
 import React from 'react'
 import styles from './product-card.module.scss'
-import useAddToCart from '@/hooks/useAddToCart'
+import LoginForm from '@/component/users/form/login'
+import { useState } from 'react'
+import useAlert from '@/hooks/use-alert'
 
-export default function ProductCard({ product_id, img, price, name, brand}) {
-  // 品牌只顯示一次
-  const { addToCart } = useAddToCart()
-
-  console.log('product_id:', product_id)
-
-  const handleAddToCart = () => {
-    if (product_id) {
-      addToCart({ id: product_id, type: 'product' })
-    } else {
-      console.error('未找到對應的 product_id')
+export default function ProductCard({
+  product_id,
+  img,
+  price,
+  name,
+  brand,
+  addToCart,
+  auth,
+  setShowLoginPrompt,
+}) {
+  // 加入收藏 阻止冒泡
+  const { success, error } = useAlert()
+  const handleLinkClick = async (event) => {
+    if (event.target.classList.contains(styles['cart'])) {
+      event.preventDefault()
+      if (!auth.isLoggedIn) {
+        setShowLoginPrompt(true)
+      } else {
+        addToCart({ id: product_id, type: 'product' })
+        success('商品已加入購物車')
+      }
     }
   }
 
@@ -50,7 +62,7 @@ export default function ProductCard({ product_id, img, price, name, brand}) {
                   className={`${styles['cart']}`}
                   src="/icons/icon-cart.svg"
                   alt=""
-                  onClick={()=>handleAddToCart()}
+                  onClick={handleLinkClick}
                 />
               </div>
             </div>

@@ -6,11 +6,11 @@ export default function Breadcrumb() {
   return (
     <div className={styles.breadcrumb}>
       <Link href="/" passHref>
-        <a>首頁</a>
+        <div>首頁</div>
       </Link>
       <span className={styles.separator}>/</span>
       <Link href="/course" passHref>
-        <a>精選課程</a>
+        <div>精選課程</div>
       </Link>
       <a href="#" className={styles['chevron-left']}>
         <img src="/icons/icon-chevron-left.svg" alt="Chevron Left" />

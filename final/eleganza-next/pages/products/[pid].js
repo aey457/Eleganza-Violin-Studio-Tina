@@ -4,9 +4,13 @@ import Recommend from '@/component/product/recommend/recommend'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import CommentsPage from '@/component/article/comment'
+import LoginForm from '@/component/users/form/login'
+import { useAuth } from '@/hooks/use-auth'
 
 //傳遞評論的內容
 export async function getServerSideProps(context) {
+  // 處理登入及購物車
+
   const { pid } = context.params
   try {
     const [productRes, commentsRes] = await Promise.all([
@@ -34,7 +38,7 @@ export async function getServerSideProps(context) {
 }
 
 export default function ProductDetail({ comments }) {
-  const user = {} // 從某處獲取的用戶信息
+  const user = {}
   const [product, setProduct] = useState({
     name: '',
     brand: '',

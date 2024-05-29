@@ -118,7 +118,7 @@ export default function Header() {
               </div>
               <div className="offcanvas-body d-flex flex-column list-unstyled justify-content-between ">
                 <div className="flex-grow-1  d-flex flex-column justify-content-center">
-                  <ul className={`${styles['menu']}`}>
+                  <ul className={`${styles['menu']} list-unstyled`}>
                     <li className={styles.link}>
                       <a href="/">關於阿爾扎</a>
                     </li>

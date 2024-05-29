@@ -97,7 +97,7 @@ export default function FilterLeft({
 
   return (
     <>
-      <div className={styles['filter-left']}>
+      <div className={`${styles['filter-left']} sticky-sm-top`}>
         {renderBrandFilter()}
         {productCate == 0 ? renderSizeFilter() : null}
         {productCate == 0 ? renderMaterialFilter() : null}

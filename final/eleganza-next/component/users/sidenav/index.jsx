@@ -90,13 +90,19 @@ export default function SideNav() {
             <Link
               href="#"
               onClick={() => handleMainPageClick('收藏內容')}
-              className={currentPage === '收藏內容' ? styles.sidenavselected : ''}
+              className={
+                currentPage === '收藏內容' ? styles.sidenavselected : ''
+              }
             >
               收藏內容
             </Link>
             {isSubMenuOpen && (
               <ul className={styles['sidenavsub-desktop']}>
-                <li className={currentSubPage === '商品收藏' ? styles.current : ''}>
+                <li
+                  className={
+                    currentSubPage === '商品收藏' ? styles.current : ''
+                  }
+                >
                   <Link
                     href="/users/mobile-cardlayout/product-collection"
                     onClick={() => setCurrentSubPage('商品收藏')}
@@ -104,7 +110,11 @@ export default function SideNav() {
                     商品收藏
                   </Link>
                 </li>
-                <li className={currentSubPage === '課程收藏' ? styles.current : ''}>
+                <li
+                  className={
+                    currentSubPage === '課程收藏' ? styles.current : ''
+                  }
+                >
                   <Link
                     href="/users/mobile-cardlayout/lesson-collection"
                     onClick={() => setCurrentSubPage('課程收藏')}
@@ -178,14 +188,20 @@ export default function SideNav() {
             <Link
               href="#"
               onClick={() => handleMainPageClick('收藏內容')}
-              className={currentPage === '收藏內容' ? styles.sidenavselected : ''}
+              className={
+                currentPage === '收藏內容' ? styles.sidenavselected : ''
+              }
             >
               收藏內容
               <img src="/icons/icon-chevron-right.svg" alt="" />
             </Link>
             {isSubMenuOpen && (
               <ul className={styles['sidenavsub-mobile']}>
-                <li className={currentSubPage === '商品收藏' ? styles.current : ''}>
+                <li
+                  className={
+                    currentSubPage === '商品收藏' ? styles.current : ''
+                  }
+                >
                   <Link
                     href="/users/mobile-cardlayout/product-collection"
                     onClick={() => setCurrentSubPage('商品收藏')}
@@ -193,7 +209,11 @@ export default function SideNav() {
                     商品收藏
                   </Link>
                 </li>
-                <li className={currentSubPage === '課程收藏' ? styles.current : ''}>
+                <li
+                  className={
+                    currentSubPage === '課程收藏' ? styles.current : ''
+                  }
+                >
                   <Link
                     href="/users/mobile-cardlayout/lesson-collection"
                     onClick={() => setCurrentSubPage('課程收藏')}

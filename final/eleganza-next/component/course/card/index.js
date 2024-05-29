@@ -1,4 +1,3 @@
-// components/card.js
 import React from 'react'
 import styles from './card.module.scss'
 
@@ -36,17 +35,6 @@ export default function Card({ course, onClick, onAddToCart }) {
           </div>
         </div>
         <div className={styles['card-footer']}>
-          <div className={styles['card-icons']}>
-            <img src="/icons/icon-like.svg" alt="Icon 1" />
-            <img
-              src="/icons/icon-cart.svg"
-              alt="Icon 2"
-              onClick={(e) => {
-                e.stopPropagation() // 阻止事件冒泡，避免点击图标时触发卡片的点击事件
-                onAddToCart(course.course_id)
-              }}
-            />
-          </div>
           <div className={styles['card-price']}>
             <p>${course.course_price}</p>
           </div>

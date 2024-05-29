@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import styles from './card.module.scss';
+import React, { useState } from 'react'
+import styles from './card.module.scss'
 
 export default function Card({ teachers }) {
-  const [expandedIndex, setExpandedIndex] = useState(null);
+  const [expandedIndex, setExpandedIndex] = useState(null)
 
   const handleIconClick = (index) => {
-    setExpandedIndex(expandedIndex === index ? null : index);
-  };
+    setExpandedIndex(expandedIndex === index ? null : index)
+  }
 
   return (
     <>
@@ -29,7 +29,7 @@ export default function Card({ teachers }) {
                   <ul>
                     <li>學歷: {teacher.education}</li>
                     <li>教學年資: {teacher.t_years}年</li>
-                    <li>教學經歷: {teacher.experience}</li>
+                    <li>曾獲獎項: {teacher.winning}</li>
                   </ul>
                 </div>
               </div>
@@ -39,7 +39,11 @@ export default function Card({ teachers }) {
                   onClick={() => handleIconClick(index)}
                 >
                   <img
-                    src="/icons/icon-chevron-down.svg"
+                    src={
+                      expandedIndex === index
+                        ? '/icons/icon-chevron-up.svg'
+                        : '/icons/icon-chevron-down.svg'
+                    }
                     alt="Toggle Details"
                     className="expand-icon"
                   />
@@ -55,7 +59,7 @@ export default function Card({ teachers }) {
                       <p>{teacher.introduction}</p>
                     </div>
                     <div className={styles.column}>
-                      <p>學經歷</p>
+                      <p>教學經歷</p>
                       <p>{teacher.experience}</p>
                     </div>
                     <div className={styles.column}>
@@ -75,5 +79,5 @@ export default function Card({ teachers }) {
         </div>
       ))}
     </>
-  );
+  )
 }

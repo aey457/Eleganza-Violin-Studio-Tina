@@ -3,7 +3,7 @@ import Breadcrumb from '@/component/teacher/breadcrumb'
 import Card from '@/component/teacher/card'
 import Pagination from '@/component/course/pagination'
 import styles from './teacher.module.scss'
-import teacherData from '../../data/teachersData.json' // 确保路径和文件名正确
+import teacherData from '../../data/teachersData.json'
 
 export default function TeacherList() {
   const [filter, setFilter] = useState(null)
@@ -20,12 +20,12 @@ export default function TeacherList() {
       ? updatedTeachers.filter((teacher) => teacher.courses.includes(filter))
       : updatedTeachers
     setFilteredTeachers(filteredData)
-    setCurrentPage(1) // 重置到第一页
+    setCurrentPage(1)
   }, [filter])
 
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber)
-    window.scrollTo(0, 0) // 在页码更改时滚动到页面顶部
+    window.scrollTo(0, 0)
   }
 
   const currentTeachers = filteredTeachers.slice(
@@ -36,6 +36,7 @@ export default function TeacherList() {
   return (
     <>
       <Breadcrumb />
+      <div className={styles['separator']} />
       <Card teachers={currentTeachers} />
       <Pagination
         currentPage={currentPage}

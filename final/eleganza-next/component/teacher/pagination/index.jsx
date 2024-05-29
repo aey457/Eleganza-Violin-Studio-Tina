@@ -10,11 +10,11 @@ export default function Pagination({
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   if (totalItems <= itemsPerPage) {
-    return null; // 如果总数量不超过每页显示的数量，则不显示分页组件
+    return null; 
   }
 
   const changePage = (page) => {
-    window.scrollTo(0, 0); // 确保每次翻页后都滚动到页面顶部
+    window.scrollTo(0, 0); 
     if (page >= 1 && page <= totalPages && page !== currentPage) {
       onChange(page);
     }

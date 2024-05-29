@@ -1,66 +1,140 @@
 import React, { useState } from 'react'
 import axios from 'axios'
-import { useAuth } from '@/hooks/use-auth' // 確保路徑正確
-import { useAppContext } from '@/context/AppContext' // 確保路徑正確
-import useAlert from '@/hooks/use-alert' // 確保路徑正確
-import LoginForm from '@/component/users/form/login' // 确保路径正确
+import { useAuth } from '@/hooks/use-auth'
+import { useAppContext } from '@/context/AppContext'
+import Swal from 'sweetalert2'
+import LoginForm from '@/component/users/form/login'
+import Schedule from '@/component/Schedule.js'
 import styles from './rightcolumn.module.scss'
+import { useRouter } from 'next/router'
+
+const availableTimes = {
+  // 預定的日期時間資料
+  'Sun Jun 02 2024': ['10:00', '11:00', '12:00', '13:00'],
+  'Mon Jun 03 2024': ['09:00', '11:00', '14:00'],
+  'Tue Jun 04 2024': ['10:00', '11:00', '13:00', '16:00'],
+  'Wed Jun 05 2024': ['09:00', '10:00', '14:00', '17:00'],
+  'Thu Jun 06 2024': ['09:00', '11:00', '14:00'],
+  'Fri Jun 07 2024': ['09:00', '10:00', '11:00', '13:00'],
+  'Sat Jun 08 2024': ['10:00', '11:00', '12:00', '14:00'],
+  'Sun Jun 09 2024': ['10:00', '11:00', '12:00', '13:00'],
+  'Mon Jun 10 2024': ['09:00', '11:00', '14:00'],
+  'Tue Jun 11 2024': ['10:00', '11:00', '13:00', '16:00'],
+  'Wed Jun 12 2024': ['09:00', '10:00', '14:00', '17:00'],
+  'Thu Jun 13 2024': ['09:00', '11:00', '14:00'],
+  'Fri Jun 14 2024': ['09:00', '10:00', '11:00', '13:00'],
+  'Sat Jun 15 2024': ['10:00', '11:00', '12:00', '14:00'],
+  'Sun Jun 16 2024': ['10:00', '11:00', '12:00', '13:00'],
+  'Mon Jun 17 2024': ['09:00', '11:00', '14:00'],
+  'Tue Jun 18 2024': ['10:00', '11:00', '13:00', '16:00'],
+  'Wed Jun 19 2024': ['09:00', '10:00', '14:00', '17:00'],
+  'Thu Jun 20 2024': ['09:00', '11:00', '14:00'],
+  'Fri Jun 21 2024': ['09:00', '10:00', '11:00', '13:00'],
+  'Sat Jun 22 2024': ['10:00', '11:00', '12:00', '14:00'],
+  'Sun Jun 23 2024': ['10:00', '11:00', '12:00', '13:00'],
+  'Mon Jun 24 2024': ['09:00', '11:00', '14:00'],
+  'Tue Jun 25 2024': ['10:00', '11:00', '13:00', '16:00'],
+  'Wed Jun 26 2024': ['09:00', '10:00', '14:00', '17:00'],
+  'Thu Jun 27 2024': ['09:00', '11:00', '14:00'],
+  'Fri Jun 28 2024': ['09:00', '10:00', '11:00', '13:00'],
+  'Sat Jun 29 2024': ['10:00', '11:00', '12:00', '14:00'],
+  'Sun Jun 30 2024': ['10:00', '11:00', '12:00', '13:00'],
+}
 
 export default function CourseDetailRight({ course }) {
-  const { auth } = useAuth() // 獲取用戶認證狀態
-  const { dispatch } = useAppContext() // 獲取全局狀態
-  const { success, error } = useAlert() // 使用自定義的提示函數
-  const [showOffcanvas, setShowOffcanvas] = useState(false); // 控制显示登录窗口
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false); // 控制显示请先登录提示
+  const { auth } = useAuth()
+  const { dispatch } = useAppContext()
+  const router = useRouter()
+  const [showOffcanvas, setShowOffcanvas] = useState(false)
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
+  const [quantity, setQuantity] = useState(1)
+  const [selectedTime, setSelectedTime] = useState(null)
+  const courseId = router.asPath.split('/').pop()
 
   const handleAddToCart = async () => {
     if (!auth.isLoggedIn) {
-      setShowLoginPrompt(true); // 显示请先登录提示
+      Swal.fire({
+        title: '請先登入',
+        text: '您需要登入才能加入課程至購物車。',
+        icon: 'info',
+        confirmButtonText: '登入',
+        showCancelButton: true,
+        confirmButtonColor: '#322826',
+        cancelButtonText: '取消',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // 這裡可以處理登入的邏輯，例如顯示登入表單
+          setShowOffcanvas(true)
+        }
+      })
+      return
+    }
+
+    if (!selectedTime) {
+      Swal.fire({
+        icon: 'error',
+        title: '錯誤',
+        text: '請選擇時間',
+        confirmButtonText: '確定',
+        confirmButtonColor: '#322826',
+      })
       return
     }
 
     try {
       const response = await axios.post('http://localhost:3005/api/cart/add', {
-        user_id: auth.userData.id, // 使用當前登錄用戶的ID
-        course_id: course.id,
+        user_id: auth.userData.id,
+        course_id: course.course_id,
+        quantity,
+        time: selectedTime,
       })
 
       if (response.data.status === 'success') {
-        success('課程已加入購物車')
-        dispatch({ type: 'ADD_TO_CART', payload: course })
-
-        // 更新會員中心的我的課程
-        const userResponse = await axios.post(
-          'http://localhost:3005/api/user/courses/add',
-          {
-            user_id: auth.userData.id, // 使用當前登錄用戶的ID
-            course_id: course.id,
-          },
-        )
-
-        if (userResponse.data.status === 'success') {
-          dispatch({ type: 'ADD_USER_COURSE', payload: course })
-        } else {
-          error(userResponse.data.message)
-        }
+        Swal.fire({
+          icon: 'success',
+          title: '成功',
+          text: '課程已加入購物車',
+          confirmButtonText: '確定',
+          confirmButtonColor: '#322826',
+        })
       } else {
-        error(response.data.message)
+        Swal.fire({
+          icon: 'error',
+          title: '錯誤',
+          text: response.data.message,
+          confirmButtonText: '確定',
+          confirmButtonColor: '#322826',
+        })
       }
     } catch (error) {
       console.error('加入購物車錯誤:', error)
-      error('無法加入購物車')
+      Swal.fire({
+        icon: 'error',
+        title: '錯誤',
+        text: '無法加入購物車',
+        confirmButtonText: '確定',
+        confirmButtonColor: '#322826',
+      })
     }
   }
 
-  const handleLoginSuccess = async () => {
-    setShowOffcanvas(false); // 隐藏登录窗口
-    setShowLoginPrompt(false); // 隐藏请先登录提示
-  };
+  const handleIncrease = () => {
+    setQuantity((prevQuantity) => prevQuantity + 1)
+  }
+
+  const handleDecrease = () => {
+    setQuantity((prevQuantity) => (prevQuantity > 1 ? prevQuantity - 1 : 1))
+  }
+
+  const handleLoginSuccess = () => {
+    setShowOffcanvas(false)
+    setShowLoginPrompt(false)
+  }
 
   const handleConfirmLogin = () => {
-    setShowLoginPrompt(false); // 隐藏请先登录提示
-    setShowOffcanvas(true); // 显示登录窗口
-  };
+    setShowLoginPrompt(false)
+    setShowOffcanvas(true)
+  }
 
   return (
     <div className={styles['right-column']}>
@@ -69,31 +143,20 @@ export default function CourseDetailRight({ course }) {
           {course.course_style} / {course.teacher_name}老師
         </p>
         <h1>{course.course_name}</h1>
-        <div className={styles['stars-container']}>
-          <div className={styles['stars']}>
-            {[...Array(4)].map((_, i) => (
-              <img key={i} src="/icons/icon-star-solid.svg" alt="star" />
-            ))}
-            <img src="/icons/icon-star.svg" alt="star" />
-          </div>
-          <p>4.3(24)</p>
-        </div>
+        <div className={styles['stars-container']}>{/* 星星評分組件 */}</div>
         <h2>${course.course_price}</h2>
         <p>課程時間</p>
-        <p>起止日期：2024-03-29 至 2024-05-17</p>
-        <p>上課時間：19:00 ~ 21:00</p>
+        <Schedule
+          availableTimes={availableTimes}
+          onTimeSelect={setSelectedTime}
+        />
         <div className={styles['course-details-bottom']}>
-          <div className={styles['like-icon']}>
-            {/* <a href="#">
-              <img src="/icons/icon-like.svg" alt="like" />
-            </a> */}
-          </div>
           <div className={styles['action-icons']}>
-            <a href="#">
+            <a href="#" onClick={handleDecrease}>
               <img src="/icons/icon-minus.svg" alt="minus" />
             </a>
-            <button>1</button>
-            <a href="#">
+            <button>{quantity}</button>
+            <a href="#" onClick={handleIncrease}>
               <img src="/icons/icon-plus.svg" alt="plus" />
             </a>
           </div>
@@ -105,6 +168,7 @@ export default function CourseDetailRight({ course }) {
           </button>
         </div>
       </div>
+
       {showLoginPrompt && (
         <div className={styles.overlaybg}>
           <div className={styles.popupwindow}>

@@ -6,11 +6,11 @@ const { Product, User, Course, Comment } = sequelize.models
 
 User.hasMany(Comment, { foreignKey: 'user_id' })
 Product.hasMany(Comment, { foreignKey: 'product_id' })
-// Course.hasMany(Comment, { foreignKey: 'course_id' })
+Course.hasMany(Comment, { foreignKey: 'course_id' })
 
 Comment.belongsTo(User, { foreignKey: 'user_id' })
 Comment.belongsTo(Product, { foreignKey: 'product_id' })
-// Comment.belongsTo(Course, { foreignKey: 'course_id' })
+Comment.belongsTo(Course, { foreignKey: 'course_id' })
 
 //得到文章的所有評論
 router.get('/', async function (req, res) {
@@ -83,35 +83,26 @@ router.get('/product/:productId', async function (req, res) {
 })
 
 // 得到某課程的所有評論
-// router.get('/course/:courseId', async function (req, res) {
-//   const { courseId } = req.params
-//   try {
-//     const comments = await Comment.findAll({
-//       include: [
-//         {
-//           model: User,
-//           attributes: ['user_name'], // 只包含用戶名
-//         },
-//       ],
-//       where: { course_id: courseId }, //根據商品ID過濾評論
-//       logging: console.log,
-//     })
+router.get('/course/:id', async (req, res) => {
+  const { id } = req.params // 修改此行，將 courseId 改為 id
+  try {
+    const comments = await Comment.findAll({
+      include: [{ model: User, attributes: ['user_name'] }],
+      where: { course_id: id }, // 將 courseId 改為 id
+      logging: console.log,
+    })
 
-//     if (comments.length === 0) {
-//       return res.status(404).json({
-//         status: 'error',
-//         message: 'No comments found for this product',
-//       })
-//     }
-
-//     return res.json({ status: 'success', data: { comments } })
-//   } catch (error) {
-//     console.error('Error fetching comments:', error)
-//     return res
-//       .status(500)
-//       .json({ status: 'error', message: 'Error fetching comments' })
-//   }
-// })
+    return res.json({
+      status: 'success',
+      data: { comments: comments.length > 0 ? comments : 'No comments found' },
+    })
+  } catch (error) {
+    console.error('Error fetching comments:', error)
+    return res
+      .status(500)
+      .json({ status: 'error', message: 'Error fetching comments' })
+  }
+})
 
 //新增評論
 router.post('/', async function (req, res) {

@@ -6,6 +6,12 @@ import { useState } from 'react'
 import { useEffect } from 'react'
 import Link from 'next/link'
 
+// 加入購物車的判斷
+import useAddToCart from '@/hooks/useAddToCart'
+import useAlert from '@/hooks/use-alert'
+import LoginForm from '@/component/users/form/login'
+import { useAuth } from '@/hooks/use-auth'
+
 export default function Products() {
   const [products, setProducts] = useState([])
   const [productCate, setProductCate] = useState(0)
@@ -121,31 +127,38 @@ export default function Products() {
     }
 
     // 遍歷每個篩選條件
+    const filterConditions = {}
     queryParams.forEach((qp) => {
       const key = Object.keys(qp)[0]
       const value = Object.values(qp)[0]
+      if (!filterConditions[key]) {
+        filterConditions[key] = new Set()
+      }
+      filterConditions[key].add(value)
+    })
 
-      // 對每個篩選條件進行篩選
-      const filtered = products
-        .filter((product) => {
-          return product[key] === value
-        })
-        .filter((product) => {
-          if (!seenProductIds.has(product.product_id)) {
-            seenProductIds.add(product.product_id)
-            return true
-          }
-          return false
-        })
+    // 遍歷產品，檢查每個產品是否滿足所有篩選條件
+    products.forEach((product) => {
+      let matchesAllConditions = true
 
-      // 將當前篩選條件下的產品加入到 filteredProducts 中
-      filteredProducts = filteredProducts.concat(filtered)
+      // 檢查產品是否滿足所有篩選條件
+      for (let key in filterConditions) {
+        if (!filterConditions[key].has(product[key])) {
+          matchesAllConditions = false
+          break
+        }
+      }
+
+      // 如果產品滿足所有條件且未出現過，則加入結果
+      if (matchesAllConditions && !seenProductIds.has(product.product_id)) {
+        seenProductIds.add(product.product_id)
+        filteredProducts.push(product)
+      }
     })
     if (JSON.stringify(filteredProducts) !== JSON.stringify(filterProduct)) {
       // 更新 filterProduct 狀態
       setFilterProduct(filteredProducts)
       setSelectedOption('預設排序')
-      // console.log(filteredProducts)
     }
   }
 
@@ -238,6 +251,19 @@ export default function Products() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  // 判斷登入狀態
+  const { auth } = useAuth()
+
+  // 加入購物車
+  const { addToCart } = useAddToCart()
+
+  // 謝林靜
+  const [showOffcanvas, setShowOffcanvas] = useState(false)
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
+  const handleConfirmLogin = () => {
+    setShowLoginPrompt(false)
+    setShowOffcanvas(true)
+  }
   return (
     <>
       <NavTop
@@ -270,31 +296,72 @@ export default function Products() {
           </div>
           <div className="col col-md-9">
             <div className="row g-3 g-xl-4 row-cols-2 row-cols-sm-3 row-cols-xl-4">
-              {filterProduct.map((product) => {
-                const { name, brand, product_price, img, product_id } = product
-                const productName = name.replace(brand, '')
-                //   console.log(productName)
-
-                return (
-                  <div className="col" key={product.product_id}>
-                    <Link href={`/products/${product.product_id}`}>
-                      <ProductCard
-                        name={renderProductName(productName)}
-                        brand={renderProductName(brand)}
-                        price={product_price}
-                        img={img}
-                        product_id={product_id}
-                      />
-                    </Link>
-                  </div>
-                )
-              })}
+              {filterProduct.length == 0 ? (
+                <div className="col w-100 text-center">沒有符合條件的產品</div>
+              ) : (
+                filterProduct
+                  .slice(pagination, pagination + 12)
+                  .map((product) => {
+                    const { name, brand, product_price, img, product_id } =
+                      product
+                    const productName = name.replace(brand, '')
+                    return (
+                      <div className="col" key={product.product_id}>
+                        <Link href={`/products/${product.product_id}`}>
+                          <ProductCard
+                            name={renderProductName(productName)}
+                            brand={renderProductName(brand)}
+                            price={product_price}
+                            img={img}
+                            product_id={product_id}
+                            addToCart={addToCart}
+                            auth={auth}
+                            setShowLoginPrompt={setShowLoginPrompt}
+                          />
+                        </Link>
+                      </div>
+                    )
+                  })
+              )}
             </div>
-            <Pagination
-              pageCount={pageCount}
-              handlePageClick={handlePageClick}
-              pagination={pagination}
-            />
+            {filterProduct.length == 0 ? (
+              ''
+            ) : (
+              <Pagination
+                pageCount={pageCount}
+                handlePageClick={handlePageClick}
+                pagination={pagination}
+              />
+            )}
+          </div>
+        </div>
+        {showLoginPrompt && (
+          <>
+            <div className={`overlaybg`}>
+              <div className={`popupwindow`}>
+                <p>請先登入</p>
+                <button onClick={handleConfirmLogin}>確定</button>
+              </div>
+            </div>
+          </>
+        )}
+        <div
+          className={`offcanvas offcanvas-end ${showOffcanvas ? 'show' : ''}`}
+          tabIndex="-1"
+          id="offcanvasRight"
+          aria-labelledby="offcanvasRightLabel"
+        >
+          <div className="offcanvas-header">
+            <button
+              type="button"
+              className="btn-close text-reset"
+              data-bs-dismiss="offcanvas"
+              aria-label="Close"
+              onClick={() => setShowOffcanvas(false)}
+            ></button>
+          </div>
+          <div className="offcanvas-body">
+            <LoginForm />
           </div>
         </div>
       </div>
@@ -306,6 +373,46 @@ export default function Products() {
             @media screen and (min-width: 768px) {
               margin-bottom: 0;
             }
+          }
+          .overlaybg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            background: rgba(130, 130, 130, 0.5);
+            z-index: 9999;
+          }
+          .popupwindow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 20px 60px;
+            background: var(--color-text-light);
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
+            border-radius: 8px;
+            & p {
+              margin: 0;
+              font-size: 20px;
+            }
+          }
+          .popupwindow button {
+            background-color: #322826;
+            font-size: 16px;
+            color: #fffdfd;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+          }
+
+          .popupwindow button:hover {
+            background-color: #211c1a;
           }
         `}
       </style>

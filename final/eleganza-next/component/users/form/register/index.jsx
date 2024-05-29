@@ -48,21 +48,21 @@ export default function RegisterForm() {
 
     const emailRegex = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
     if (!user.useremail) {
-      newErrors.useremail = '*帳號為必填';
-      hasErrors = true;
-    }else if (!emailRegex.test(user.useremail)) {
-      newErrors.useremail = '請輸入正確的電郵格式';
-      hasErrors = true;
+      newErrors.useremail = '*帳號為必填'
+      hasErrors = true
+    } else if (!emailRegex.test(user.useremail)) {
+      newErrors.useremail = '請輸入正確的電郵格式'
+      hasErrors = true
     }
 
     // 手機號碼格式檢查
-    const phoneRegex = /^09\d{8}$/;
+    const phoneRegex = /^09\d{8}$/
     if (!user.phone) {
-      newErrors.phone = '*手機號碼為必填';
-      hasErrors = true;
+      newErrors.phone = '*手機號碼為必填'
+      hasErrors = true
     } else if (!phoneRegex.test(user.phone)) {
-      newErrors.phone = '手機號碼必須是以 09 開頭的 10 位阿拉伯數字';
-      hasErrors = true;
+      newErrors.phone = '手機號碼必須是以 09 開頭的 10 位阿拉伯數字'
+      hasErrors = true
     }
 
     if (user.password !== user.confirmPassword) {
@@ -71,13 +71,15 @@ export default function RegisterForm() {
       hasErrors = true
     }
 
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()\-_=+{};:,<.>]{6,}$/;
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()\-_=+{};:,<.>]{6,}$/
     if (!user.password) {
-      newErrors.password = '*密碼為必填';
-      hasErrors = true;
+      newErrors.password = '*密碼為必填'
+      hasErrors = true
     } else if (!passwordRegex.test(user.password)) {
-      newErrors.password = '密碼必須至少6個字符，必須包含數字、羅馬字母大小寫，並可加入特殊符號';
-      hasErrors = true;
+      newErrors.password =
+        '密碼必須至少6個字符，必須包含數字、羅馬字母大小寫，並可加入特殊符號'
+      hasErrors = true
     }
 
     if (!user.confirmPassword) {

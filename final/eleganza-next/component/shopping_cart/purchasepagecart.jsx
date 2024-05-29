@@ -1,11 +1,12 @@
+import { useState, useEffect } from 'react'
+import classNames from 'classnames'
 import animation from './CSS/animation.module.css'
 import pageCart from './CSS/page_cart.module.css'
 import pageCheckOut from './CSS/page_check_out.module.css'
 import pageComplete from './CSS/page_complete.module.css'
-import { useState, useEffect } from 'react';
-import classNames from 'classnames'
-import axios from 'axios';
-import { useRouter } from 'next/router';
+import axios from 'axios'
+import { useRouter } from 'next/router'
+import useFormFieldValidation from '@/hooks/useFormFieldValidation'
 
 const ShoppingCart = () => {
   const [progress, setProgress] = useState(10)
@@ -40,83 +41,193 @@ const ShoppingCart = () => {
     setProgress(55) // 當按下按鈕時，將進度更新為 55%
   }
 
+  const [totalPrice, setTotalPrice] = useState(0) // 初始化總價格為0
+
+  const [cartItems, setCartItems] = useState([]) // 用於存儲購物車項目
+  const [total, setTotal] = useState(0) // 用於存儲購物車總金額
+  const [itemCount, setItemCount] = useState(0) // 用於存儲購物車商品數量
+  const [isCartEmpty, setIsCartEmpty] = useState(true) // 用於檢查購物車是否為空
+
+  const router = useRouter()
+
+  useEffect(() => {
+    const storedUserId = localStorage.getItem('userId')
+    const storedAccessToken = localStorage.getItem('accessToken')
+
+    if (storedUserId && storedAccessToken) {
+      // 發送獲取購物車資料的請求
+      axios
+        .get(`http://localhost:3005/api/cart/${storedUserId}`, {
+          headers: {
+            Authorization: `Bearer ${storedAccessToken}`,
+          },
+        })
+        .then((response) => {
+          // 讀取完資料後，更新狀態
+          setCartItems(response.data.data.cartItems)
+          setIsCartEmpty(response.data.data.cartItems.length === 0)
+
+          // 進一步的邏輯，例如計算總價格等
+          const newTotal = response.data.data.cartItems.reduce(
+            (total, cartItem) => {
+              const price = cartItem.product_price || cartItem.course_price
+              return total + price * cartItem.quantity
+            },
+            0,
+          )
+
+          // 設置總價格並加上運費
+          setTotalPrice(newTotal + 100)
+          setTotal(newTotal)
+          setItemCount(response.data.data.cartItems.length)
+        })
+        .catch((error) => {
+          console.error('Error fetching cart details:', error)
+        })
+    }
+  }, [])
+
+  const updateQuantity = async (index, newQuantity) => {
+    const updatedCartItems = [...cartItems]
+    const cartItem = updatedCartItems[index]
+
+    if (newQuantity < 1) {
+      updatedCartItems.splice(index, 1)
+    } else {
+      updatedCartItems[index] = {
+        ...updatedCartItems[index],
+        quantity: newQuantity,
+      }
+    }
+
+    setCartItems(updatedCartItems)
+
+    // 在 setCartItems 後立即執行相關的計算和 API 調用
+    const newTotal = updatedCartItems.reduce((total, cartItem) => {
+      const price = cartItem.product_price || cartItem.course_price
+      return total + price * cartItem.quantity
+    }, 0)
+    setTotal(newTotal)
+    setItemCount(updatedCartItems.length)
+    setIsCartEmpty(updatedCartItems.length === 0)
+
+    try {
+      if (newQuantity < 1) {
+        await axios.post(
+          `http://localhost:3005/api/cart/decrease/${cartItem.shopping_cart_id}`,
+          { product_id: cartItem.product_id, course_id: cartItem.course_id },
+        )
+      } else {
+        await axios.put(
+          `http://localhost:3005/api/cart/update/${cartItem.shopping_cart_id}`,
+          { quantity: newQuantity },
+        )
+      }
+    } catch (error) {
+      console.error('更新購物車時出錯:', error)
+    }
+  }
+
+  const {
+    numbeInput,
+    emailInput,
+    telInput,
+    nameInput,
+    cardNumberInput,
+    expiryInput,
+    cvvInput,
+    cityInput,
+    postalCodeInput,
+    streetInput,
+    nameOnCardInput,
+    billingAddressInput,
+    sameAsShippingInput,
+    validateFields,
+    shippingMethodRef,
+    paymentMethodRef,
+  } = useFormFieldValidation(selectedShippingMethod, selectedPaymentMethod)
+
+  const [orderId, setOrderId] = useState(null)
+
+  const getValue = (ref) => {
+    try {
+      return ref.current.value
+    } catch (error) {
+      if (error instanceof TypeError) {
+        return undefined
+      }
+      throw error
+    }
+  }
+
+  const getChecked = (ref) => {
+    try {
+      return ref.current.checked
+    } catch (error) {
+      if (error instanceof TypeError) {
+        return undefined
+      }
+      throw error
+    }
+  }
+
   const confirmPaymentBtn = () => {
+    if (validateFields()) {
+      // 從 localStorage 獲取 userId
+      const userId = localStorage.getItem('userId')
 
-    const emailInput = document.querySelector('input[type="email"]');
-    const telInput = document.querySelector('input[type="tel"]');
-    const nameInput = document.querySelector('input[aria-label="姓名"]');
-    const selectedPaymentMethod = document.getElementById('payment-method').value;
-    const selectedShippingMethod = document.getElementById('shipping-method').value;
-    const cardNumberInput = document.querySelector('input[aria-label="Card number"]');
-    const expiryInput = document.querySelector('input[aria-label="Expiration date(MM/YY)"]');
-    const cvvInput = document.querySelector('input[aria-label="Security code"]');
+      // 儲存 API URL 到變數
+      const apiUrl = 'http://localhost:3005/api/order/checkout/' + userId
 
+      // 傳送資料到後端 API
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          shippingMethod: getValue(shippingMethodRef),
+          paymentMethod: getValue(paymentMethodRef),
+          creditCardNo: getValue(cardNumberInput),
+          totalPrice: totalPrice,
+          email: getValue(emailInput),
+          tel: getValue(telInput),
+          name: getValue(nameInput),
+          expiry: getValue(expiryInput),
+          cvv: getValue(cvvInput),
+          city: getValue(cityInput),
+          street: getValue(streetInput),
+          postalCode: getValue(postalCodeInput),
+          nameOnCard: getValue(nameOnCardInput),
+          billingAddress: getValue(billingAddressInput),
+          sameAsShipping: getChecked(sameAsShippingInput),
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data)
+          if (data && data.order_id) {
+            console.log('Setting orderId:', data.order_id)
+            setOrderId(data.order_id)
+          }
+        })
+        .catch((error) => {
+          console.error('Error:', error)
+        })
 
-    // 檢查選擇的寄送方式是否為預設值
-    if (selectedShippingMethod === 'shipping-method') {
-      alert('請選擇有效的寄送方式');
-      return;
+      setCheckoutAnimation(false)
+      setPageCartAnimation(false)
+      setTimeout(() => {
+        setPageCartAnimationdps1(true)
+        setPageCartAnimation1(true)
+      }, 250)
+
+      setTimeout(() => {
+        setCheckoutAnimation1(true)
+      }, 50)
+
+      setProgress(104)
     }
-
-    // 檢查選擇的付款方式是否為預設值
-    if (selectedPaymentMethod === 'payment-method') {
-      alert('請選擇有效的付款方式');
-      return;
-    }
-
-    // 防禦性檢查以確保 input 元素都存在並且不為空
-    if (!emailInput || !telInput || !nameInput) {
-      console.error('Input elements not found');
-      return;
-    }
-
-    // 檢查姓名是否為空
-    if (!nameInput.value.trim()) {
-      alert('請輸入姓名');
-      return;
-    }
-
-    // 檢查電子郵件是否為空並且是否符合格式
-    if (!emailInput.value || !emailInput.validity.valid) {
-      alert('請輸入有效的電子郵件地址');
-      return;
-    }
-
-    // 檢查電話號碼是否為空並且是否符合格式
-    if (!telInput.value || !telInput.validity.valid) {
-      alert('請輸入有效的電話號碼（10位數字）');
-      return;
-    }
-
-    if (!cardNumberInput.value.trim() || !cardNumberInput.validity.valid) {
-      alert('請輸入13至16位數字的信用卡號');
-      return;
-    }
-
-    // 檢查有效期限是否為空並且格式正確
-    if (!expiryInput.value.trim() || !expiryInput.validity.valid) {
-      alert('請輸入有效的有效期限，格式為 MM/YY');
-      return;
-    }
-
-    // 檢查安全碼是否為空並且格式正確
-    if (!cvvInput.value.trim() || !cvvInput.validity.valid) {
-      alert('請輸入3至4位數字的安全碼');
-      return;
-    }
-
-    setCheckoutAnimation(false)
-    setPageCartAnimation(false)
-    setTimeout(() => {
-      setPageCartAnimationdps1(true)
-      setPageCartAnimation1(true)
-    }, 250)
-
-    setTimeout(() => {
-      setCheckoutAnimation1(true)
-    }, 50)
-
-    setProgress(104)
   }
 
   const handleSelectChange = (event) => {
@@ -144,87 +255,6 @@ const ShoppingCart = () => {
     // 切換帳單地址的可見性
     setIsBillingAddressVisible(!event.target.checked)
   }
-
-  const [cartItems, setCartItems] = useState([]); // 用於存儲購物車項目
-  const [total, setTotal] = useState(0); // 用於存儲購物車總金額
-  const [itemCount, setItemCount] = useState(0); // 用於存儲購物車商品數量
-  const [userId, setUserId] = useState(''); // 從 URL 中獲取 userId
-
-  const router = useRouter();
-
-  useEffect(() => {
-    fetchCart();
-  }, []); // 在頁面加載時觸發一次
-
-  // 獲取購物車數據
-  const fetchCart = async () => {
-    try {
-      const response = await axios.get(`http://localhost:3005/api/cart/:userId`);
-      const { cartItems, total } = response.data.data;
-
-      // 更新狀態
-      setCartItems(cartItems);
-      setTotal(total);
-      setItemCount(cartItems.length); // 更新商品數量
-    } catch (error) {
-      console.error('獲取購物車時出錯:', error);
-    }
-  };
-
-  // 在組件掛載時設置 userId
-  useEffect(() => {
-    const userIdParam = router.query.userId || '';
-    setUserId(userIdParam);
-  }, [router.query.userId]);
-
-  // 當 userId 改變時重新獲取購物車數據
-  useEffect(() => {
-    if (userId) {
-      fetchCart();
-    }
-  }, [userId]);
-
-  const updateQuantity = async (index, newQuantity) => {
-    const updatedCartItems = [...cartItems];
-    const cartItem = updatedCartItems[index];
-
-    if (newQuantity < 1) {
-      updatedCartItems.splice(index, 1);
-      setCartItems(updatedCartItems);
-      const newTotal = updatedCartItems.reduce((total, cartItem) => {
-        const price = cartItem.product_price || cartItem.course_price;
-        return total + price * cartItem.quantity;
-      }, 0);
-      setTotal(newTotal);
-      setItemCount(updatedCartItems.length);
-
-      try {
-        await axios.post(`http://localhost:3005/api/cart/decrease/${cartItem.shopping_cart_id}`, { product_id: cartItem.product_id, course_id: cartItem.course_id });
-      } catch (error) {
-        console.error('減少購物車中商品時出錯:', error);
-      }
-    } else {
-      updatedCartItems[index] = {
-        ...updatedCartItems[index],
-        quantity: newQuantity
-      };
-      setCartItems(updatedCartItems);
-      const newTotal = updatedCartItems.reduce((total, cartItem) => {
-        const price = cartItem.product_price || cartItem.course_price;
-        return total + price * cartItem.quantity;
-      }, 0);
-      setTotal(newTotal);
-
-      try {
-        await axios.put(`http://localhost:3005/api/cart/update/${cartItem.shopping_cart_id}`, { quantity: newQuantity });
-      } catch (error) {
-        console.error('更新購物車數量時出錯:', error);
-      }
-    }
-  };
-
-
-
 
   return (
     <>
@@ -295,7 +325,6 @@ const ShoppingCart = () => {
           <div className={pageCart.cartContainer}>
             {/* 遍歷購物車項目並顯示 */}
             {cartItems.map((item, index) => (
-
               <div className={pageCart.product} key={item.id}>
                 <article className={pageCart['product-card-middle']}>
                   <img
@@ -306,12 +335,9 @@ const ShoppingCart = () => {
                   {/* src={`@/public/images/product_images/${item.product_img || `@/public/images/course_images/${item.course_img`} */}
                   <section className={pageCart['product-info']}>
                     <p className={pageCart['product-name']}>
-                      {item.name || item.course_name}{' '}
-                      {/* 顯示商品或課程名稱 */}
+                      {item.name || item.course_name} {/* 顯示商品或課程名稱 */}
                     </p>
-                    {item.course_name && (
-                      <p>{item.t_name} 教師</p>
-                    )}
+                    {item.course_name && <p>{item.t_name} 教師</p>}
                   </section>
                   <div className={pageCart['quantity-selector']}>
                     <button
@@ -322,6 +348,7 @@ const ShoppingCart = () => {
                     </button>
                     <input
                       type="number"
+                      ref={numbeInput}
                       value={item.quantity}
                       className={pageCart['quantity-input']}
                       onChange={(e) =>
@@ -346,10 +373,15 @@ const ShoppingCart = () => {
             {/* 購物車總結信息 */}
             <div className={pageCart['cart']} id="cart">
               <section className={pageCart['cart-summary']}>
-                <h2 className={pageCart['cart-item-count']}>共{itemCount}項商品</h2>
+                <h2 className={pageCart['cart-item-count']}>
+                  共{itemCount}項商品
+                </h2>
                 <div className={pageCart['ubtotal-container']}>
                   <span className={pageCart['subtotal-label']}>小計</span>
-                  <span className={pageCart['subtotal-amount']}>${total}</span> {/* 顯示購物車總金額 */}
+                  <span className={pageCart['subtotal-amount']}>
+                    ${total}
+                  </span>{' '}
+                  {/* 顯示購物車總金額 */}
                 </div>
                 <button
                   className={pageCart['checkout-button']}
@@ -379,12 +411,14 @@ const ShoppingCart = () => {
             </h2>
             <input
               type="text"
+              ref={nameInput}
               className={`${pageCheckOut['input-field']}`}
               placeholder="姓名"
               aria-label="姓名"
             />
             <input
               type="email"
+              ref={emailInput}
               className={`${pageCheckOut['input-field']}`}
               placeholder="電子郵件"
               aria-label="電子郵件"
@@ -393,6 +427,7 @@ const ShoppingCart = () => {
             />
             <input
               type="tel"
+              ref={telInput}
               className={`${pageCheckOut['input-field']}`}
               placeholder="電話號碼"
               aria-label="電話號碼"
@@ -408,11 +443,12 @@ const ShoppingCart = () => {
                 className={`${pageCheckOut['shipping-method-text']}`}
                 onChange={handleSelectChange}
                 value={selectedShippingMethod}
+                ref={shippingMethodRef}
               >
                 <option value="shipping-method">選擇寄送方式</option>
                 <option value="pickup">於本中心領貨</option>
                 <option value="pickup_course">於本中心上課</option>
-                <option value="home_delivery">送貨到府</option>
+                <option value="home_delivery">宅配到府</option>
               </select>
             </div>
             {isAccordionOpen && (
@@ -421,19 +457,22 @@ const ShoppingCart = () => {
                 id="home-delivery-details"
               >
                 <input
-                  type="text"
+                  type="city"
+                  ref={cityInput}
                   className={`${pageCheckOut['input-field']}`}
                   placeholder="城市,區"
                   aria-label="城市,區"
                 />
                 <input
-                  type="text"
+                  type="postal"
+                  ref={postalCodeInput}
                   className={`${pageCheckOut['input-field']}`}
                   placeholder="郵遞區號"
                   aria-label="郵遞區號"
                 />
                 <input
-                  type="text"
+                  type="street"
+                  ref={streetInput}
                   className={`${pageCheckOut['input-field']}`}
                   placeholder="街道,巷弄,門號,樓層"
                   aria-label="街道,巷弄,門號,樓層"
@@ -468,6 +507,7 @@ const ShoppingCart = () => {
                     onChange={handlePaymentMethodChange}
                     value={selectedPaymentMethod}
                     className={`${pageCheckOut['shipping-method-text']}`}
+                    ref={paymentMethodRef}
                   >
                     <option value="payment-method">選擇付款方式</option>
                     <option value="credit_card">信用卡付款</option>
@@ -482,6 +522,7 @@ const ShoppingCart = () => {
                 >
                   <input
                     type="text"
+                    ref={cardNumberInput}
                     className={`${pageCheckOut['card-number-input']}`}
                     placeholder="信用卡號"
                     aria-label="Card number"
@@ -493,6 +534,7 @@ const ShoppingCart = () => {
                   <div className={`${pageCheckOut['expiry-cvv-container']}`}>
                     <input
                       type="text"
+                      ref={expiryInput}
                       className={`${pageCheckOut['expiry-input']}`}
                       placeholder="有效期限(月/年)"
                       aria-label="Expiration date(MM/YY)"
@@ -502,6 +544,7 @@ const ShoppingCart = () => {
                     />
                     <input
                       type="text"
+                      ref={cvvInput}
                       className={`${pageCheckOut['cvv-input']}`}
                       placeholder="安全碼"
                       aria-label="Security code"
@@ -512,6 +555,7 @@ const ShoppingCart = () => {
                   </div>
                   <input
                     type="text"
+                    ref={nameOnCardInput}
                     className={`${pageCheckOut['name-on-card-input']}`}
                     placeholder="持卡人姓名"
                     aria-label="Name on card"
@@ -519,6 +563,7 @@ const ShoppingCart = () => {
                   {isBillingAddressVisible && (
                     <input
                       type="text"
+                      ref={billingAddressInput}
                       className={`${pageCheckOut['name-on-card-input']} ${pageCheckOut['collapsed']}`}
                       placeholder="帳單地址"
                       aria-label="billing address"
@@ -528,13 +573,19 @@ const ShoppingCart = () => {
                   <div className={`${pageCheckOut['billing-address-toggle']}`}>
                     <input
                       type="checkbox"
+                      ref={sameAsShippingInput}
                       id="same-as-shipping"
-                      style={{ display: selectedShippingMethod === "home_delivery" ? "block" : "none" }}
+                      style={{
+                        display:
+                          selectedShippingMethod === 'home_delivery'
+                            ? 'block'
+                            : 'none',
+                      }}
                       onChange={handleCheckboxChange}
                       checked={!isBillingAddressVisible}
                     />
 
-                    {selectedShippingMethod === "home_delivery" && (
+                    {selectedShippingMethod === 'home_delivery' && (
                       <label htmlFor="same-as-shipping">
                         帳單地址與送貨地址相同
                       </label>
@@ -550,30 +601,7 @@ const ShoppingCart = () => {
               確認付款
             </button>
           </div>
-          {/* 付款細節                         
-          <div
-            className={`${pageCheckOut['product-summary']}`}
-            id="product-summary"
-            // onClick={toggleAccordion}
-            value="product_summary"
-          >
-            <div className={`${pageCheckOut['product-summary-header']}`}>
-              <div className={`${pageCheckOut['product-count']}`}>
-                共4項商品
-              </div>
-              <div className={`${pageCheckOut['view-details']}`}>
-                <div className={`${pageCheckOut['view-details-text']}`}>
-                  查看細節
-                </div>
-                <img
-                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/89a2eb8b3f9339d8295e1ac0899f104210047ebb4df553dd921179c722d37977?apiKey=c27276553397403aa6ef8985c3e17cb4&"
-                  alt="View details icon"
-                  className={`${pageCheckOut['view-details-icon']}`}
-                />
-              </div>
-            </div>
-          </div> */}
-          {/* 手風琴中的內容 */}
+
           <div
             className={`${pageCheckOut['product-list']} ${pageCheckOut['collapsed992']}`}
             id="product-list"
@@ -598,7 +626,9 @@ const ShoppingCart = () => {
                         {/* 只有在讀取 course_name 時顯示教師名稱 */}
                       </div>
                       <div className={pageCheckOut['product-price']}>
-                        ${(item.product_price || item.course_price) * item.quantity}{' '}
+                        $
+                        {(item.product_price || item.course_price) *
+                          item.quantity}{' '}
                         {/* 顯示商品價格 */}
                       </div>
                       <div className={pageCheckOut['product-quantity1']}>
@@ -622,7 +652,7 @@ const ShoppingCart = () => {
                 <div className={`${pageCheckOut['order-total']}`}>
                   <div className={`${pageCheckOut['total-label']}`}>總計</div>
                   <div className={`${pageCheckOut['total-amount']}`}>
-                    ${total + 100}
+                    ${totalPrice}
                   </div>
                 </div>
               </div>
@@ -655,49 +685,29 @@ const ShoppingCart = () => {
                       <p className={`${pageComplete['product-brand']}`}>
                         {item.name || item.course_name}{' '}
                       </p>
-                      {/* <h2 className={`${pageComplete['product-name']}`}>
-                    Allegro 3/4 Violin Outfit
-                  </h2> */}
                     </div>
-                    <p className={`${pageComplete['product-price']}`}> ${item.product_price || item.course_price}{' '}</p>
-                    <p className={`${pageComplete['product-quantity']}`}>{item.quantity}</p>
+                    <p className={`${pageComplete['product-price']}`}>
+                      {' '}
+                      ${item.product_price || item.course_price}{' '}
+                    </p>
+                    <p className={`${pageComplete['product-quantity']}`}>
+                      {item.quantity}
+                    </p>
                   </div>
                 </section>
               </div>
             ))}
-            {/* <article className={pageCheckOut['product-item']}>
-                    <div className={pageCheckOut['product-image']}>
-                      <img
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/9cc8942c6894dd8f11e0c920c451d72effa179041967d336d10571a26fc990e6?apiKey=c27276553397403aa6ef8985c3e17cb4&"
-                        alt="Karl Höfner Allegro 3/4 Violin Outfit"
-                      />
-                    </div>
-                    <div className={pageCheckOut['product-details']}>
-                      <div className={pageCheckOut['product-info']}>
-                        <h2>
-                          {item.name || item.course_name}{' '}
-
-                        </h2>
-                        {item.name || item.course_name}
-
-                      </div>
-                      <div className={pageCheckOut['product-price']}>
-                        ${(item.product_price || item.course_price) * item.quantity}{' '}
-                      </div>
-                      <div className={pageCheckOut['product-quantity1']}>
-                        {item.quantity}
-                      </div>
-                    </div>
-                  </article> */}
             <section className={`${pageComplete['order-summary1']}`}>
-              <div className={`${pageComplete['order-summary-row']}`}>
-                <p className={`${pageComplete['order-summary-label']}`}>
-                  訂單編號
-                </p>
-                <p className={`${pageComplete['order-summary-value']}`}>
-                  #65515151
-                </p>
-              </div>
+              {orderId && (
+                <div className={`${pageComplete['order-summary-row']}`}>
+                  <p className={`${pageComplete['order-summary-label']}`}>
+                    訂單編號
+                  </p>
+                  <p className={`${pageComplete['order-summary-value']}`}>
+                    #{orderId}
+                  </p>
+                </div>
+              )}
               <div className={`${pageComplete['order-summary-row']}`}>
                 <p className={`${pageComplete['order-summary-label']}`}>
                   下單日期
@@ -706,6 +716,7 @@ const ShoppingCart = () => {
                   {new Date().toLocaleDateString('zh-Hant')}
                 </p>
               </div>
+
               <div className={`${pageComplete['order-summary-row']}`}>
                 <p className={`${pageComplete['order-summary-label']}`}>總計</p>
                 <p className={`${pageComplete['order-summary-value']}`}>
@@ -714,16 +725,22 @@ const ShoppingCart = () => {
               </div>
             </section>
             <div className={`${pageComplete['order-actions']}`}>
-              <button className={`${pageComplete['order-history-button']}`}>
+              <a
+                className={`${pageComplete['order-history-button']}`}
+                href="http://localhost:3000/users/order-history/order-history"
+              >
                 歷史訂單
-              </button>
-              <button className={`${pageComplete['back-to-products-button']}`}>
+              </a>
+              <a
+                className={`${pageComplete['back-to-products-button']}`}
+                href="http://localhost:3000/products"
+              >
                 返回商品頁
-              </button>
+              </a>
             </div>
           </main>
         </div>
-      </main >
+      </main>
     </>
   )
 }

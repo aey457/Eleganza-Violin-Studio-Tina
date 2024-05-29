@@ -51,8 +51,8 @@ export default function Footer() {
                     <span className={`${styles.title}`}>聯繫方式</span>
                     <span>
                       <Link href={`mailto:eleganza@gmail.com`}>
-                      <img src="/icons/icon-mail-white.svg" />{' '}
-                      eleganza@gmail.com
+                        <img src="/icons/icon-mail-white.svg" />{' '}
+                        eleganza@gmail.com
                       </Link>
                     </span>
                     <span>

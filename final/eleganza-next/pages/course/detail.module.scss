@@ -1,27 +1,34 @@
-.course-details-container {
-  display: flex; // 使用 Flexbox 排版
-  align-items: flex-start; // 确保左侧栏的图片与右侧栏的内容对齐
-  margin-bottom: 60px;
+.container {
+  padding: 20px;
 }
 
 .back-button {
-  position: absolute; // 绝对定位
-  top: 20px; // 距离顶部 20px
-  left: 20px; // 距离左侧 20px
   display: flex;
   align-items: center;
+  margin-top: 10px;
+  margin-bottom: 20px;
   background: none;
   border: none;
   cursor: pointer;
-  padding: 10px;
-  font-size: 1em;
-  color: #322826;
 
   img {
-    margin-right: 10px;
+    margin-right: 5px;
   }
+}
 
-  &:hover {
-    color: #211c1a;
-  }
+.course-details-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.comments-container {
+  margin-top: 40px;
+}
+
+.separator {
+  width: 100%;
+  height: 1px;
+  background-color: #9c9191;
+  margin: 10px 0;
 }

@@ -24,3 +24,5 @@ C. Back-end folder: express-base-esm-main, to run the development server:
     ACCESS_TOKEN_SECRET=your_access_token
     ```
 Be sure to connect to the databse and table successfully, so that the content of website can be shown.
+
+I was charge of all the "users" and its related parts both in front and back-end development.
